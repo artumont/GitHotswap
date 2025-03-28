@@ -1,27 +1,27 @@
 package utils
 
 import (
+	"encoding/json"
 	"log"
 	"os"
-	"encoding/json"
 	"path/filepath"
 )
 
 type Config struct {
-    Profiles map[string]Profile `json:"profiles"`
+	Profiles map[string]Profile `json:"profiles"`
 }
 
 type Profile struct {
-    Name  string `json:"name"`
-    Email string `json:"email"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
 
 func GetExecutablePath() string {
-    exe, err := os.Executable()
-    if err != nil {
-        log.Panic("Error getting executable path:", err)
-    }
-    return filepath.Dir(exe)
+	exe, err := os.Executable()
+	if err != nil {
+		log.Panic("Error getting executable path:", err)
+	}
+	return filepath.Dir(exe)
 }
 
 func LoadConfig() (Config, error) {
@@ -34,12 +34,12 @@ func LoadConfig() (Config, error) {
 	}
 	defer file.Close()
 
-    var config Config
-    decoder := json.NewDecoder(file)
-    if err := decoder.Decode(&config); err != nil {
-        log.Panic("Error decoding config file:", err)
+	var config Config
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&config); err != nil {
+		log.Panic("Error decoding config file:", err)
 		return Config{}, err
-    }
+	}
 
 	return config, nil
 }

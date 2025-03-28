@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/artumont/GitHotswap/src/utils"
 	"log"
-	"fmt"
 	"os"
 )
 
@@ -24,7 +24,7 @@ func main() {
 	}
 
 	switch args[0] {
-		default:
-			log.Println("Unknown command: ", args[0], " | use git-hotswap help or git-hotswap -h for help")
+	    default:
+		    log.Println("Unknown command: ", args[0], " | use git-hotswap help or git-hotswap -h for help")
 	}
 }
