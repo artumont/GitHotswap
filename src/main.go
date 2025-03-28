@@ -31,20 +31,13 @@ func main() {
 			fmt.Println("Usage: git-hotswap swap <profile_name>")
 			os.Exit(0)
 		}
-		profileName := args[1]
-		if profile, exists := config.Profiles[profileName]; exists {
-			fmt.Printf("Swaping to profile: %s (%s)\n", profile.Name, profile.Email)
-			commands.SwapHandler(ProcessParams(args), config)
-		} else {
-			fmt.Printf("Profile %s not found\n", profileName)
-		}
+		commands.SwapHandler(ProcessParams(args[1:]), config)
 	case"profile", "-p":
 		if len(args) < 3 {
 			fmt.Println("Usage: git-hotswap profile <operation> [options]")
 			os.Exit(0)
 		}
-		operation := args[1]
-		commands.ProfileHandler(operation, ProcessParams(args[2:]), config)
+		commands.ProfileHandler(ProcessParams(args[1:]), config)
 	case "help", "-h":
 		fmt.Println("Usage: git-hotswap <command> [options]")
 		fmt.Println("Commands:")
