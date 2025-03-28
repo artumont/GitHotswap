@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/artumont/GitHotswap/src/utils"
 	"log"
 	"os"
+	"strings"
+
+	"github.com/artumont/GitHotswap/src/commands"
+	"github.com/artumont/GitHotswap/src/utils"	
 )
 
 func main() {
@@ -17,14 +20,83 @@ func main() {
 	}
 
 	config, err := utils.LoadConfig()
-	log.Println("Loaded config: ", config)
 	if err != nil {
 		log.Fatal("Error loading config: ", err)
 		os.Exit(0)
 	}
 
 	switch args[0] {
-		default:
-			log.Println("Unknown command: ", args[0], " | use git-hotswap help or git-hotswap -h for help")
+	case "swap", "-s":
+		if len(args) < 2 {
+			fmt.Println("Usage: git-hotswap swap <profile_name>")
+			os.Exit(0)
+		}
+		profileName := args[1]
+		if profile, exists := config.Profiles[profileName]; exists {
+			fmt.Printf("Swaping to profile: %s (%s)\n", profile.Name, profile.Email)
+			commands.SwapHandler(ProcessParams(args), config)
+		} else {
+			fmt.Printf("Profile %s not found\n", profileName)
+		}
+	case"profile", "-p":
+		if len(args) < 3 {
+			fmt.Println("Usage: git-hotswap profile <operation> [options]")
+			os.Exit(0)
+		}
+		operation := args[1]
+		commands.ProfileHandler(operation, ProcessParams(args[2:]), config)
+	case "help", "-h":
+		fmt.Println("Usage: git-hotswap <command> [options]")
+		fmt.Println("Commands:")
+		fmt.Println("  swap <profile_name>              Swap to the specified profile")
+		fmt.Println("  profile <operation> [options]    Manage profiles (add, remove, list)")
+		fmt.Println("  help, -h                         Show this help message")
+		fmt.Println("Options:")
+		fmt.Println("  --name <name>, -n <name>         Name of the profile")
+		fmt.Println("  --email <email>, -e <email>      Email of the profile")
+		fmt.Println("  --global, -g                     Modify global config")
+	default:
+		log.Println("Unknown command: `", args[0], "` | use git-hotswap help or git-hotswap -h for help")
 	}
+}
+
+func ProcessParams(args []string, v ...any) map[string]string {
+    params := make(map[string]string)
+
+    for i := 0; i < len(args); i++ {
+        arg := args[i]
+
+		// @note: Handling arguments with '=' sign
+		// @syntax: '--key=value'
+        if idx := strings.Index(arg, "="); idx != -1 {
+            key := arg[:idx]
+            value := arg[idx+1:]
+            key = strings.TrimPrefix(key, "--")
+            params[key] = value
+            continue
+        }
+
+		// @note: Handling arguments with ' ' sign
+		// @syntax: --key value
+        if strings.HasPrefix(arg, "--") || strings.HasPrefix(arg, "-") {
+            key := strings.TrimLeft(arg, "-")
+            if i+1 < len(args) && !strings.HasPrefix(args[i+1], "-") {
+                params[key] = args[i+1]
+                i++
+            } else if key == "global" {
+                params[key] = "true"
+            } else {
+                log.Printf("Error: %s requires a value", arg)
+            }
+        }
+
+		// @note: Handling positional arguments
+		// @syntax: <profile_name>
+		if i == 0 {
+			params["positional"] = arg
+			continue
+		}
+    }
+
+    return params
 }

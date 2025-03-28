@@ -4,7 +4,7 @@ import (
 	"github.com/artumont/GitHotswap/src/utils"
 )
 
-func ProfileHandler(operation string, args []string, config utils.Config) {
+func ProfileHandler(operation string, args map[string]string, config utils.Config) {
 
 }
 
