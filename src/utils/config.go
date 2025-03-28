@@ -24,7 +24,7 @@ func GetExecutablePath() string {
     return filepath.Dir(exe)
 }
 
-func LoadConfig() (Config, error){
+func LoadConfig() (Config, error) {
 	filePath := GetExecutablePath()
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -42,6 +42,21 @@ func LoadConfig() (Config, error){
     }
 
 	return config, nil
+}
+
+func SaveConfig(config Config) {
+	filePath := GetExecutablePath()
+	file, err := os.Create(filePath)
+	if err != nil {
+		log.Panic("Error creating config file:", err)
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(config)
+	if err != nil {
+		log.Panic("Error writing config file:", err)
+	}
 }
 
 func CreateConfig(filePath string, config Config) {
