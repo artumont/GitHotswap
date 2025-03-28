@@ -1,3 +1,3 @@
 @echo off
-go build -o git-hotswap.exe .\src\
+go build -o ./bin/git-hotswap.exe .\src\
 @echo on
