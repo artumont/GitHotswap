@@ -16,59 +16,91 @@ type Profile struct {
 	Email string `json:"email"`
 }
 
-func GetExecutablePath() string {
-	exe, err := os.Executable()
-	if err != nil {
-		log.Panic("Error getting executable path:", err)
-	}
-	return filepath.Dir(exe)
+func GetConfigPath() string {
+	configDir := filepath.Join(os.Getenv("APPDATA"), "GitHotswap")
+	return filepath.Join(configDir, "config.json")
+}
+
+func ensureConfigDir() error {
+	configDir := filepath.Join(os.Getenv("APPDATA"), "GitHotswap")
+	return os.MkdirAll(configDir, 0755)
 }
 
 func LoadConfig() (Config, error) {
-	filePath := GetExecutablePath()
+	if err := ensureConfigDir(); err != nil {
+		return Config{Profiles: make(map[string]Profile)}, err
+	}
+
+	filePath := GetConfigPath()
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Panic("Error opening config file:", err)
-		CreateConfig(filePath, Config{})
-		return Config{}, err
+		log.Println("File not found, creating new config file")
+		config := Config{
+			Profiles: make(map[string]Profile),
+		}
+		if err := CreateConfig(filePath, config); err != nil {
+			return Config{}, err
+		}
+		return config, nil
 	}
 	defer file.Close()
 
 	var config Config
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {
-		log.Panic("Error decoding config file:", err)
-		return Config{}, err
+		log.Println("Error decoding config file:", err)
+		if config.Profiles == nil {
+			config.Profiles = make(map[string]Profile)
+		}
+		return config, err
+	}
+    
+	if config.Profiles == nil {
+		config.Profiles = make(map[string]Profile)
 	}
 
 	return config, nil
 }
 
-func SaveConfig(config Config) {
-	filePath := GetExecutablePath()
+func SaveConfig(config Config) error {
+	if err := ensureConfigDir(); err != nil {
+		return err
+	}
+
+	filePath := GetConfigPath()
 	file, err := os.Create(filePath)
 	if err != nil {
-		log.Panic("Error creating config file:", err)
+		log.Println("Error creating config file:", err)
+		return err
 	}
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
-	err = encoder.Encode(config)
-	if err != nil {
-		log.Panic("Error writing config file:", err)
+	if err := encoder.Encode(config); err != nil {
+		log.Println("Error writing config file:", err)
+		return err
 	}
+
+	return nil
 }
 
-func CreateConfig(filePath string, config Config) {
+func CreateConfig(filePath string, config Config) error {
+	if err := ensureConfigDir(); err != nil {
+		return err
+	}
+
 	file, err := os.Create(filePath)
 	if err != nil {
-		log.Panic("Error creating config file:", err)
+		log.Println("Error creating config file:", err)
+		return err
 	}
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
-	err = encoder.Encode(config)
-	if err != nil {
-		log.Panic("Error writing config file:", err)
+	if err := encoder.Encode(config); err != nil {
+		log.Println("Error writing config file:", err)
+		return err
 	}
+
+	return nil
 }
