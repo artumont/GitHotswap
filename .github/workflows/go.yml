@@ -2,21 +2,8 @@ name: Release Binary
 
 on:
   push:
-    branches: [ "main" ]
-    paths-ignore:
-      - '.vscode/**'
-      - '**.md'
-      - 'LICENSE'
-      - '.gitignore'
-      - 'build.cmd'
-  pull_request:
-    branches: [ "main" ]
-    paths-ignore:
-      - '.vscode/**'
-      - '**.md'
-      - 'LICENSE'
-      - '.gitignore'
-      - 'build.cmd'
+    tags:
+      - 'v*'  # Triggers only on version tags like v1.0.0
 
 jobs:
   build:
