@@ -2,8 +2,21 @@ name: Release Binary
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [ "main" ]
+    paths-ignore:
+      - '.vscode/**'
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'build.cmd'
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore:
+      - '.vscode/**'
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'build.cmd'
 
 jobs:
   build:
