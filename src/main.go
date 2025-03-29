@@ -23,32 +23,29 @@ func main() {
 		log.Fatal("Error loading config: ", err)
 		os.Exit(0)
 	}
-
+	
 	switch args[0] {
-	case "swap", "-s":
+	case "swap":
 		if len(args) < 2 {
 			fmt.Println("Usage: git-hotswap swap <profile_name>")
 			os.Exit(0)
 		}
-		commands.SwapHandler(ProcessParams(args[1:]), config)
-	case"profile", "-p":
-		if len(args) < 3 {
+		commands.SwapHandler(ProcessParams(args[2:]), config)
+	case"profile":
+		if len(args) < 2 {
 			fmt.Println("Usage: git-hotswap profile <operation> [options]")
 			os.Exit(0)
 		}
-		commands.ProfileHandler(ProcessParams(args[1:]), config)
-	case "help", "-h":
+		operation := args[1]
+		commands.ProfileHandler(operation, ProcessParams(args[1:]), config)
+	case "help":
 		fmt.Println("Usage: git-hotswap <command> [options]")
 		fmt.Println("Commands:")
-		fmt.Println("  swap <profile_name>              Swap to the specified profile")
+		fmt.Println("  swap [profile_name]              Swap to the specified profile (profile_name is optional if only two profiles exist)")
 		fmt.Println("  profile <operation> [options]    Manage profiles (add, remove, list)")
-		fmt.Println("  help, -h                         Show this help message")
-		fmt.Println("Options:")
-		fmt.Println("  --name <name>, -n <name>         Name of the profile")
-		fmt.Println("  --email <email>, -e <email>      Email of the profile")
-		fmt.Println("  --global, -g                     Modify global config")
+		fmt.Println("  help                             Show this help message")
 	default:
-		log.Println("Unknown command: `", args[0], "` | use git-hotswap help or git-hotswap -h for help")
+		fmt.Println("Unknown command: `", args[0], "` | use git-hotswap help for help")
 	}
 }
 
