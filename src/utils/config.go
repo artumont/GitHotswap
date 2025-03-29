@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -34,7 +34,7 @@ func LoadConfig() (Config, error) {
 	filePath := GetConfigPath()
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Println("File not found, creating new config file")
+		fmt.Println("File not found, creating new config file")
 		config := Config{
 			Profiles: make(map[string]Profile),
 		}
@@ -48,7 +48,7 @@ func LoadConfig() (Config, error) {
 	var config Config
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {
-		log.Println("Error decoding config file:", err)
+		fmt.Println("Error decoding config file:", err)
 		if config.Profiles == nil {
 			config.Profiles = make(map[string]Profile)
 		}
@@ -70,14 +70,14 @@ func SaveConfig(config Config) error {
 	filePath := GetConfigPath()
 	file, err := os.Create(filePath)
 	if err != nil {
-		log.Println("Error creating config file:", err)
+		fmt.Println("Error creating config file:", err)
 		return err
 	}
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
 	if err := encoder.Encode(config); err != nil {
-		log.Println("Error writing config file:", err)
+		fmt.Println("Error writing config file:", err)
 		return err
 	}
 
@@ -91,14 +91,14 @@ func CreateConfig(filePath string, config Config) error {
 
 	file, err := os.Create(filePath)
 	if err != nil {
-		log.Println("Error creating config file:", err)
+		fmt.Println("Error creating config file:", err)
 		return err
 	}
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
 	if err := encoder.Encode(config); err != nil {
-		log.Println("Error writing config file:", err)
+		fmt.Println("Error writing config file:", err)
 		return err
 	}
 

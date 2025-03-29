@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -20,7 +19,7 @@ func main() {
 
 	config, err := utils.LoadConfig()
 	if err != nil {
-		log.Fatal("Error loading config: ", err)
+		fmt.Println("Error loading config: ", err)
 		os.Exit(0)
 	}
 	
@@ -75,7 +74,7 @@ func ProcessParams(args []string, v ...any) map[string]string {
             } else if key == "global" {
                 params[key] = "true"
             } else {
-                log.Printf("Error: %s requires a value", arg)
+                fmt.Printf("Error: %s requires a value", arg)
             }
         }
 
