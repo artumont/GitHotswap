@@ -27,12 +27,35 @@ func ProfileHandler(operation string, args map[string]string, config utils.Confi
 			return
 		}
 	case "rename":
-		key, key_exists := args["old"]
+		key, key_exists := args["key"]
 		name, name_exists := args["new"]
 		if key_exists && name_exists {
 			RenameProfile(key, name, config)
 		} else {
-			fmt.Println("Usage: git-hotswap profile rename --old <key> --new <key>")
+			fmt.Println("Usage: git-hotswap profile rename --key <key> --new <key>")
+			return
+		}
+	case "edit": 
+		key, key_exists := args["key"]
+		name, name_exists := args["name"]
+		email, email_exists := args["email"]
+		if key_exists {
+			profile := config.Profiles[key]
+			if name_exists {
+				profile.Name = name
+			}
+			if email_exists {
+				profile.Email = email
+			}
+			config.Profiles[key] = profile
+			err := utils.SaveConfig(config)
+			if err != nil {
+				fmt.Printf("Error saving config: %s\n", err)
+				return
+			}
+			fmt.Printf("Profile %s updated successfully\n", key)
+		} else {
+			fmt.Println("Usage: git-hotswap profile edit --key <key> [--name <name>] [--email <email>]")
 			return
 		}
 	case "list":
@@ -47,11 +70,12 @@ func ProfileHandler(operation string, args map[string]string, config utils.Confi
 	case "help":
 		fmt.Println("Usage: git-hotswap profile <operation> [options]")
 		fmt.Println("Operations:")
-		fmt.Println("  add --key <key> --name <name> --email <email>    Add a new profile")
-		fmt.Println("  remove --key <key>                               Remove a profile")
-		fmt.Println("  rename --old <key> --new <key>                   Rename a profile")
-		fmt.Println("  list                                             List all profiles")
-		fmt.Println("  help                                             Show this help message")
+		fmt.Println("  add --key <key> --name <name> --email <email>        Add a new profile")
+		fmt.Println("  remove --key <key>                                   Remove a profile")
+		fmt.Println("  rename --old <key> --new <key>                       Rename a profile")
+		fmt.Println("  edit --key <key> [--name <name>] [--email <email>]   Edit a profile")
+		fmt.Println("  list                                                 List all profiles")
+		fmt.Println("  help                                                 Show this help message")
 		return
 	default: 
 		fmt.Printf("Unknown command: %s | use git-hotswap help or git-hotswap -h for help\n", args["positional"])
@@ -92,7 +116,8 @@ func RenameProfile(key string, name string, config utils.Config) {
 		fmt.Printf("Profile with key %s does not exist\n", key)
 		return
 	}
-	config.Profiles[key] = utils.Profile{Name: name, Email: config.Profiles[key].Email}
+	config.Profiles[name] = utils.Profile{Name: config.Profiles[key].Name, Email: config.Profiles[key].Email}
+	delete(config.Profiles, key)
 	err := utils.SaveConfig(config)
 	if err != nil {
 		fmt.Printf("Error saving config: %s\n", err)
