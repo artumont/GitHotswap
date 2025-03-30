@@ -28,7 +28,7 @@ jobs:
         mkdir -p bin/
         go build -v -o bin/git-hotswap.exe ./src
     
-    - name: Generate Changelog
+    - name: Changelog
       id: changelog
       uses: metcalfc/changelog-generator@v4.5.0
       with:
