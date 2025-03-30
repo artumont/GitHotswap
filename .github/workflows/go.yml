@@ -28,7 +28,7 @@ jobs:
         mkdir -p bin/
         go build -v -o bin/git-hotswap.exe ./src
         
-    - name: Create Release
+    - name: Release
       id: create_release
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
