@@ -25,11 +25,11 @@ func main() {
 	
 	switch args[0] {
 	case "swap":
-		if len(args) < 2 {
+		if len(args) < 1 {
 			fmt.Println("Usage: git-hotswap swap <profile_name>")
 			os.Exit(0)
 		}
-		commands.SwapHandler(ProcessParams(args[2:]), config)
+		commands.SwapHandler(ProcessParams(args[1:]), config)
 	case"profile":
 		if len(args) < 2 {
 			fmt.Println("Usage: git-hotswap profile <operation> [options]")

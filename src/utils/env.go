@@ -35,7 +35,7 @@ func IsGitEnvPresent() bool {
 	return true
 }
 
-func GetCurrentGitProfile() (string, string) {
+func GetGitProfile() (string, string) {
 	cwd := GetCwd()
 	gitPath := filepath.Join(cwd, ".git")
 
@@ -88,4 +88,55 @@ func GetCurrentGitProfile() (string, string) {
 	}
 	
 	return "", ""
+}
+
+func ChangeGitProfile(name string, email string) error {
+    cwd := GetCwd()
+    gitPath := filepath.Join(cwd, ".git")
+
+    info, err := os.Stat(gitPath)
+    if err != nil {
+        fmt.Println("No git repository found")
+        return err
+    }
+
+    if !info.IsDir() {
+        fmt.Println("No git repository found")
+        return fmt.Errorf("no git repository found")
+    }
+
+    gitConfigFile := filepath.Join(gitPath, "config")
+    
+    content, err := os.ReadFile(gitConfigFile)
+    if err != nil {
+        fmt.Println("Error reading git config file:", err)
+        return err
+    }
+
+    lines := strings.Split(string(content), "\n")
+    var newLines []string
+    skipNext := 0
+
+    for i := 0; i < len(lines); i++ {
+        if skipNext > 0 {
+            skipNext--
+            continue
+        }
+
+        if strings.Contains(lines[i], "[user]") {
+            skipNext = 2
+            continue
+        }
+        newLines = append(newLines, lines[i])
+    }
+
+    newLines = append(newLines, fmt.Sprintf("[user]\n\tname = %s\n\temail = %s", name, email))
+
+    err = os.WriteFile(gitConfigFile, []byte(strings.Join(newLines, "\n")), 0644)
+    if err != nil {
+        fmt.Println("Error writing to git config file:", err)
+        return err
+    }
+
+	return nil
 }
