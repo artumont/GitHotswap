@@ -29,10 +29,9 @@ jobs:
         go build -v -o bin/git-hotswap.exe ./src
     
     - name: Changelog
-      id: changelog
-      uses: metcalfc/changelog-generator@v4.5.0
+      uses: janheinrichmerker/action-github-changelog-generator@v2.3
       with:
-        myToken: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }} 
         
     - name: Release
       id: create_release
@@ -43,5 +42,5 @@ jobs:
         name: 'Version ${{ github.ref_name }}'
         body: |
           ## What's Changed
-          ${{ steps.changelog.outputs.changelog }}
+          ${{ changelog }}
         files: bin/git-hotswap.exe
