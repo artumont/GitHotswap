@@ -2,6 +2,8 @@ name: Release Binary
 
 on:
   push:
+    branches:
+      - 'main'  # @note: Triggers on main branch
     tags:
       - 'v*'  # @note: Triggers only on version tags
 
