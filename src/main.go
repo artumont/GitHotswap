@@ -23,7 +23,9 @@ func main() {
 	//}
 
 	switch args[0] {
-
+	default:
+		utils.Warning("Unknown command: ", args[0], " try 'git-hotswap help'")
+		os.Exit(0)
 	}
 }
 
