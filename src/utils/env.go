@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 func GetCwd() string {
@@ -23,12 +23,12 @@ func IsGitEnvPresent() bool {
 
 	info, err := os.Stat(gitPath)
 	if err != nil {
-		fmt.Println("Error checking .git directory:", err)
+		Warning("No git repository found")
 		return false
 	}
 
 	if !info.IsDir() {
-		fmt.Println("No git repository found")
+		Warning("No git repository found")
 		return false
 	}
 
@@ -44,19 +44,19 @@ func GetGitProfile() (string, string) {
 
 	info, err := os.Stat(gitPath)
 	if err != nil {
-		fmt.Println("Error checking .git directory:", err)
+		Warning("No git repository found")
 		return "", ""
 	}
 
 	if !info.IsDir() {
-		fmt.Println("No git repository found")
+		Warning("No git repository found")
 		return "", ""
 	}
 
 	gitConfigFile := filepath.Join(gitPath, "config")
 	file, err := os.Open(gitConfigFile)
 	if err != nil {
-		fmt.Println("Error opening git config file:", err)
+		Warning("No git config file found")
 		return "", ""
 	}
 	defer file.Close()
@@ -68,7 +68,7 @@ func GetGitProfile() (string, string) {
 	}
 
 	if err := scanner.Err(); err != nil {
-        fmt.Println("Error reading git config file:", err)
+        Error("Error reading git config file:", err)
         return "", ""
     }
 
@@ -96,12 +96,12 @@ func ChangeGitProfile(name string, email string) error {
 
     info, err := os.Stat(gitPath)
     if err != nil {
-        fmt.Println("No git repository found")
+        Warning("No git repository found")
         return err
     }
 
     if !info.IsDir() {
-        fmt.Println("No git repository found")
+        Warning("No git repository found")
         return fmt.Errorf("no git repository found")
     }
 
@@ -109,7 +109,7 @@ func ChangeGitProfile(name string, email string) error {
     
     content, err := os.ReadFile(gitConfigFile)
     if err != nil {
-        fmt.Println("Error reading git config file:", err)
+        Error("Error reading git config file:", err)
         return err
     }
 
@@ -134,7 +134,7 @@ func ChangeGitProfile(name string, email string) error {
 
     err = os.WriteFile(gitConfigFile, []byte(strings.Join(newLines, "\n")), 0644)
     if err != nil {
-        fmt.Println("Error writing to git config file:", err)
+        Error("Error writing to git config file:", err)
         return err
     }
 
