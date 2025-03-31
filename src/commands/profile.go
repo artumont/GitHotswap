@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/artumont/GitHotswap/src/utils"
 )
 
@@ -15,7 +13,7 @@ func ProfileHandler(operation string, args map[string]string, config utils.Confi
 		if key_exists && name_exists && email_exists {
 			AddProfile(key, name, email, config)
 		} else {
-			fmt.Println("Usage: git-hotswap profile add --key <key> --name <name> --email <email>")
+			utils.Info("Usage: git-hotswap profile add --key <key> --name <name> --email <email>")
 			return
 		}
 	case "remove":
@@ -23,7 +21,7 @@ func ProfileHandler(operation string, args map[string]string, config utils.Confi
 		if key_exists {
 			RemoveProfile(key, config)
 		} else {
-			fmt.Println("Usage: git-hotswap profile remove --key <key>")
+			utils.Info("Usage: git-hotswap profile remove --key <key>")
 			return
 		}
 	case "rename":
@@ -32,10 +30,10 @@ func ProfileHandler(operation string, args map[string]string, config utils.Confi
 		if key_exists && name_exists {
 			RenameProfile(key, name, config)
 		} else {
-			fmt.Println("Usage: git-hotswap profile rename --key <key> --new <key>")
+			utils.Info("Usage: git-hotswap profile rename --key <key> --new <key>")
 			return
 		}
-	case "edit": 
+	case "edit":
 		key, key_exists := args["key"]
 		name, name_exists := args["name"]
 		email, email_exists := args["email"]
@@ -50,78 +48,78 @@ func ProfileHandler(operation string, args map[string]string, config utils.Confi
 			config.Profiles[key] = profile
 			err := utils.SaveConfig(config)
 			if err != nil {
-				fmt.Printf("Error saving config: %s\n", err)
+				utils.Error("Error saving config:", err)
 				return
 			}
-			fmt.Printf("Profile %s updated successfully\n", key)
+			utils.Success("Profile", key, "updated successfully")
 		} else {
-			fmt.Println("Usage: git-hotswap profile edit --key <key> [--name <name>] [--email <email>]")
+			utils.Info("Usage: git-hotswap profile edit --key <key> [--name <name>] [--email <email>]")
 			return
 		}
 	case "list":
 		if len(config.Profiles) == 0 {
-			fmt.Println("No profiles found")
+			utils.Info("No profiles found")
 			return
 		}
-		fmt.Println("Profiles:")
+		utils.Info("Profiles:")
 		for key, profile := range config.Profiles {
-			fmt.Printf("  %s: %s <%s>\n", key, profile.Name, profile.Email)
+			utils.Info(" ", key+":", profile.Name, "<"+profile.Email+">")
 		}
 	case "help":
-		fmt.Println("Usage: git-hotswap profile <operation> [options]")
-		fmt.Println("Operations:")
-		fmt.Println("  add --key <key> --name <name> --email <email>        Add a new profile")
-		fmt.Println("  remove --key <key>                                   Remove a profile")
-		fmt.Println("  rename --old <key> --new <key>                       Rename a profile")
-		fmt.Println("  edit --key <key> [--name <name>] [--email <email>]   Edit a profile")
-		fmt.Println("  list                                                 List all profiles")
-		fmt.Println("  help                                                 Show this help message")
+		utils.Info("Usage: git-hotswap profile <operation> [options]")
+		utils.Info("Operations:")
+		utils.Info("  add --key <key> --name <name> --email <email>        Add a new profile")
+		utils.Info("  remove --key <key>                                   Remove a profile")
+		utils.Info("  rename --old <key> --new <key>                       Rename a profile")
+		utils.Info("  edit --key <key> [--name <name>] [--email <email>]   Edit a profile")
+		utils.Info("  list                                                 List all profiles")
+		utils.Info("  help                                                 Show this help message")
 		return
-	default: 
-		fmt.Printf("Unknown command: %s | use git-hotswap help or git-hotswap -h for help\n", args["positional"])
+	default:
+		utils.Warning("Unknown command:", args["positional"], "| use git-hotswap help or git-hotswap -h for help")
 		return
 	}
 }
 
 func AddProfile(key string, name string, email string, config utils.Config) {
 	if _, exists := config.Profiles[key]; exists {
-		fmt.Printf("Profile with key %s already exists\n", key)
+		utils.Error("Profile with key", key, "already exists")
 		return
 	}
 	config.Profiles[key] = utils.Profile{Name: name, Email: email}
 	err := utils.SaveConfig(config)
 	if err != nil {
-		fmt.Printf("Error saving config: %s\n", err)
+		utils.Error("Error saving config:", err)
 		return
 	}
-	fmt.Printf("Profile %s added successfully\n", key)
+	utils.Success("Profile", key, "added successfully")
 }
 
 func RemoveProfile(key string, config utils.Config) {
 	if _, exists := config.Profiles[key]; !exists {
-		fmt.Printf("Profile with key %s does not exist\n", key)
+		utils.Error("Profile with key", key, "does not exist")
 		return
 	}
 	delete(config.Profiles, key)
 	err := utils.SaveConfig(config)
 	if err != nil {
-		fmt.Printf("Error saving config: %s\n", err)
+		utils.Error("Error saving config:", err)
 		return
 	}
-	fmt.Printf("Profile %s removed successfully\n", key)
+	utils.Success("Profile", key, "removed successfully")
 }
 
 func RenameProfile(key string, name string, config utils.Config) {
 	if _, exists := config.Profiles[key]; !exists {
-		fmt.Printf("Profile with key %s does not exist\n", key)
+		utils.Error("Profile with key", key, "does not exist")
 		return
 	}
 	config.Profiles[name] = utils.Profile{Name: config.Profiles[key].Name, Email: config.Profiles[key].Email}
 	delete(config.Profiles, key)
 	err := utils.SaveConfig(config)
 	if err != nil {
-		fmt.Printf("Error saving config: %s\n", err)
+		utils.Error("Error saving config:", err)
 		return
 	}
-	fmt.Printf("Profile %s renamed successfully\n", key)
+	utils.Success("Profile", key, "renamed successfully")
 }
