@@ -8,6 +8,7 @@ type Command struct {
 	Usage       string
 	Params		map[string]string
 	NerdStuff 	string
+	// @note: This ^^ is just a place for me to put some nerdy stuff about the command.
 }
 
 var CommandList = map[string]Command{
