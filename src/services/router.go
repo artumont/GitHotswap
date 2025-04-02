@@ -1,54 +1,56 @@
 package services
 
 import (
-	"strings"
-
 	"github.com/artumont/GitHotswap/src/types"
 	"github.com/artumont/GitHotswap/src/utils"
 )
 
-func Route(args []string, config types.Config) {
-	
+var CommandList = map[string]types.Command{
+	"help": {
+		Name: "Help",
+		Identifier: "help",
+		Description: "Show help information",
+		IsReqAction: false,
+		Actions: map[string]string{
+			"<empty>": "Show minimized help information for all commands",
+			"<command>": "Show detailed help information for a specific command",
+		},
+		Handler: func(args map[string]string, config types.Config) {}, // @todo: Implement help command
+	},
+	"profile": {
+		Name: "Profile",
+		Identifier: "profile",
+		Description: "Manage profiles",
+		IsReqAction: true,
+		Actions: map[string]string{
+			"default <name>":    "Set a profile as default",
+			"create <name>": "Create a new profile",
+			"delete <name>": "Delete a profile",
+			"edit <name>":   "Edit a profile",
+			"get":    "Get the current profile",
+			"list":   "List all profiles",
+		},
+		Handler: func(args map[string]string, config types.Config) {}, // @todo: Implement profile command
+	},
+	"swap": {
+		Name: "Swap",
+		Identifier: "swap",
+		Description: "Swap the current profile with another",
+		IsReqAction: false,
+		Actions: map[string]string{
+			"<empty>": "Swap to a profile depending on the active one (via menu, active or hotswap)",
+			"to <name>": "Swap to a specific profile",
+		},
+		Handler: func(args map[string]string, config types.Config) {}, // @todo: Implement swap command
+	},
 }
 
-
-func ProcessParams(args []string, v ...any) map[string]string {
-	params := make(map[string]string)
-
-	for i := 0; i < len(args); i++ {
-		arg := args[i]
-
-		// @note: Handling arguments with '=' sign
-		// @syntax: '--key=value'
-		if idx := strings.Index(arg, "="); idx != -1 {
-			key := arg[:idx]
-			value := arg[idx+1:]
-			key = strings.TrimPrefix(key, "--")
-			params[key] = value
-			continue
-		}
-
-		// @note: Handling arguments with ' ' sign
-		// @syntax: --key value
-		if strings.HasPrefix(arg, "--") || strings.HasPrefix(arg, "-") {
-			key := strings.TrimLeft(arg, "-")
-			if i+1 < len(args) && !strings.HasPrefix(args[i+1], "-") {
-				params[key] = args[i+1]
-				i++
-			} else if key == "global" {
-				params[key] = "true"
-			} else {
-				utils.Error("Error:", arg, "requires a value")
-			}
-		}
-
-		// @note: Handling positional arguments
-		// @syntax: <profile_name>
-		if i == 0 {
-			params["positional"] = arg
-			continue
-		}
+func Route(args []string, config types.Config) {
+	switch args[0] {
+	case CommandList["help"].Identifier:
+		HelpHandler(args[1:])
+	default:
+		utils.Error("Unknown command: " + args[0], "use help for more information")
+		return
 	}
-
-	return params
 }
