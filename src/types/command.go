@@ -4,7 +4,6 @@ type Command struct {
 	Name        string
 	Identifier  string
 	Description string
-	ReqParam 	bool
 	Usage       string
 	Params		map[string]string
 	NerdStuff 	string
@@ -16,7 +15,6 @@ var CommandList = map[string]Command{
 		Name: "Help",
 		Identifier: "help",
 		Description: "Show help information",
-		ReqParam: false,
 		Usage: "help <command>",
 		Params: map[string]string{
 			"<empty>": "Show minimized help information for all commands",
@@ -28,7 +26,6 @@ var CommandList = map[string]Command{
 		Name: "Profile",
 		Identifier: "profile",
 		Description: "Manage profiles",
-		ReqParam: true,
 		Usage: "profile <command> [options]",
 		Params: map[string]string{
 			"default <name>":    "Set a profile as default",
@@ -44,7 +41,6 @@ var CommandList = map[string]Command{
 		Name: "Swap",
 		Identifier: "swap",
 		Description: "Swap the current profile with another",
-		ReqParam: false,
 		Usage: "swap [options]",
 		Params: map[string]string{
 			"<empty>": "Swap to a profile depending on the active one (via menu, active or hotswap)",
@@ -57,7 +53,6 @@ var CommandList = map[string]Command{
 		Name: "Config",
 		Identifier: "config",
 		Description: "Manage the configuration file",
-		ReqParam: true,
 		Usage: "config <command> [options]",
 		Params: map[string]string{
 			"edit": "Edit the configuration file",
