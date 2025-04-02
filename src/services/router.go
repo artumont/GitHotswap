@@ -10,7 +10,7 @@ func Route(args []string, config types.Config) {
 	case types.CommandList["help"].Identifier:
 		HelpHandler(args[1:])
 	default:
-		utils.Error("Unknown command: " + args[0], "use help for more information")
+		utils.Error("Unknown command: '" + args[0], "' | use git-hotswap help for more information")
 		return
 	}
 }

@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"github.com/artumont/GitHotswap/src/types"
-
 )
 
 func GetConfigPath() string {
