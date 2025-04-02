@@ -10,13 +10,15 @@ import (
 func main() {
 	args := os.Args[1:]
 
-	if len(args) >= 1 {
-		config, err := utils.LoadConfig()
-		if err != nil {
-			utils.Error("Error loading config:", err)
-			os.Exit(0)
-		}
+	config, err := utils.LoadConfig()
+	if err != nil {
+		utils.Error("Error loading config:", err)
+		os.Exit(0)
+	}
+	
+	services.CheckFirstRun(config)
 
+	if len(args) >= 1 {
 		services.Route(args, config)
 	} else {
 		utils.Info("Usage: git-hotswap <command> [options] | use git-hotswap help for help")

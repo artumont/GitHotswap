@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+
 	"github.com/artumont/GitHotswap/src/types"
 )
 

@@ -27,12 +27,13 @@ func HelpHandler(args []string) {
 func ShowOneCommand(command types.Command) {
 	utils.Info("Command Info:")
 	utils.Custom(color.MagentaString("  ➣"), command.Name)
-	utils.Custom(color.BlueString("     Requires Param:"), command.ReqParam)
 	utils.Custom(color.CyanString("     Description:"), command.Description)
+	utils.Custom(color.HiBlueString("     Usage:"), command.Usage)
 	utils.Custom(color.GreenString("     Params:"))
 	for paramName, paramDesc := range command.Params {
 		utils.Custom(color.YellowString("       • "+paramName+":"), paramDesc)
 	}
+	utils.Custom(color.RedString("     Nerd Stuff:"), command.NerdStuff)
 }
 
 func ShowAllCommands() {

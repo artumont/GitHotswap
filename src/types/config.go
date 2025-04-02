@@ -9,7 +9,6 @@ type Config struct {
 type Profile struct {
 	User  string 	`json:"user"`
 	Email string 	`json:"email"`
-	IsActive bool  	`json:"is_active"`
 }
 
 type Preferences struct {

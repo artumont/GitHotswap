@@ -31,6 +31,10 @@ func Custom(prefix string, args ...any) {
 	fmt.Printf("%s  %s \n", prefix, color.WhiteString(fmt.Sprint(args...)))
 }
 
+func CustomString(prefix string, args ...any) string {
+	return fmt.Sprintf("%s  %s", prefix, color.WhiteString(fmt.Sprint(args...)))
+}
+
 func CommandList(commands []types.Command) {
 	color.White("Available commands:")
 	for _, command := range commands {
