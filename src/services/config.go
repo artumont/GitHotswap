@@ -6,5 +6,5 @@ import (
 )
 
 func ConfigHandler(args []string, config types.Config) {
-
+	// @todo: Implement the config handler
 }
