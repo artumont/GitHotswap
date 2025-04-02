@@ -8,23 +8,27 @@ import (
 )
 
 func Info(args ...any) {
-	fmt.Printf("%s %s \n", color.GreenString("🛈"), color.WhiteString(fmt.Sprint(args...)))
+	fmt.Printf("%s %s \n", color.HiCyanString("🛈"), color.WhiteString(fmt.Sprint(args...)))
 }
 
 func Success(args ...any) {
-	fmt.Printf("%s  %s \n", color.GreenString("✓"), color.WhiteString(fmt.Sprint(args...)))
+	fmt.Printf("%s  %s \n", color.HiGreenString("✓"), color.WhiteString(fmt.Sprint(args...)))
 }
 
 func Warning(args ...any) {
-	fmt.Printf("%s  %s \n", color.YellowString("⚠"), color.WhiteString(fmt.Sprint(args...)))
+	fmt.Printf("%s  %s \n", color.HiYellowString("⚠"), color.WhiteString(fmt.Sprint(args...)))
 }
 
 func Error(args ...any) {
-	fmt.Printf("%s  %s \n", color.RedString("✗"), color.WhiteString(fmt.Sprint(args...)))
+	fmt.Printf("%s  %s \n", color.HiRedString("✗"), color.WhiteString(fmt.Sprint(args...)))
 }
 
 func Debug(args ...any) {
-	fmt.Printf("%s  %s \n", color.CyanString("⚙"), color.WhiteString(fmt.Sprint(args...)))
+	fmt.Printf("%s  %s \n", color.HiMagentaString("⚙"), color.WhiteString(fmt.Sprint(args...)))
+}
+
+func Custom(prefix string, args ...any) {
+	fmt.Printf("%s  %s \n", prefix, color.WhiteString(fmt.Sprint(args...)))
 }
 
 func CommandList(commands []types.Command) {

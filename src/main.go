@@ -10,7 +10,7 @@ import (
 func main() {
 	args := os.Args[1:]
 
-	if len(args) > 1 {
+	if len(args) >= 1 {
 		config, err := utils.LoadConfig()
 		if err != nil {
 			utils.Error("Error loading config:", err)
