@@ -44,7 +44,8 @@ var CommandList = map[string]Command{
 		Usage: "swap [options]",
 		Params: map[string]string{
 			"<empty>": "Swap to a profile depending on the active one (via menu, active or hotswap)",
-			"mode <mode>": "Change the default swap mode (menu, active or hotswap)",
+			"menu": "Swap to a profile using the menu",
+			"hotswap": "Swap to a profile using hotswap",
 			"to <name>": "Swap to a specific profile",
 		},
 		NerdStuff: "This just calls the swap command handler which interprets the args and based on the first arg we determine if we want to swap to a specific profile or if we want to swap to the next profile in the list (or use the menu depends on the config). If a second arg is provided we will pass it to the function as well.",
