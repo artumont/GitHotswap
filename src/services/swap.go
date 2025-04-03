@@ -56,6 +56,16 @@ func SwapHandler(args []string, config types.Config) {
 			}
 		case "menu":
 			MenuSwap(config)
+		default:
+			utils.Warning("Config file seems to have an unknown swap method, attempting fix")
+			config.Preferences.SwapMethod = "menu"
+			if err := utils.SaveConfig(config); err != nil {
+				utils.Error("Failed to fix the config file, please check the config file manually")
+				return
+			}
+			utils.Success("Config file fixed successfully")
+			utils.Info("Defaulting to menu swap method.")
+			MenuSwap(config)
 		}
 	}
 }
