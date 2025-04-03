@@ -44,7 +44,5 @@ jobs:
       with:
         make_latest: 'true'
         name: 'Version ${{ github.ref_name }}'
-        body: |
-          ## What's Changed
-          ${{ steps.changelog.outputs.changelog }}
+        body: ${{ steps.changelog.outputs.changelog }}
         files: bin/git-hotswap.exe
