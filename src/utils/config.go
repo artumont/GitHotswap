@@ -30,7 +30,7 @@ func LoadConfig() (types.Config, error) {
 		config := types.Config{
 			FirstRun:   true,
 			Profiles:   make(map[string]types.Profile),
-			Preferences: make(map[string]string),
+			Preferences: types.Preferences{SwapMethod: "menu"},
 		}
 		if err := CreateConfig(filePath, config); err != nil {
 			return types.Config{}, err
