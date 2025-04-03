@@ -28,11 +28,11 @@ var CommandList = map[string]Command{
 		Description: "Manage profiles",
 		Usage: "profile <command> [options]",
 		Params: map[string]string{
-			"create <name>": "Create a new profile",
-			"delete <name>": "Delete a profile",
-			"edit <name>":   "Edit a profile",
-			"get":    "Get the current profile",
-			"list":   "List all profiles",
+			"create <profile>": "Create a new profile",
+			"delete <profile>": "Delete a profile",
+			"edit <profile>": "Edit a profile",
+			"current": "Get the current profile",
+			"list": "List all profiles",
 		},
 		NerdStuff: "This just calls the profile command handler which interprets the args and based on the first arg (which is the command) it will call the appropriate function to handle the command. If a second arg is provided we will pass it to the function as well.",
 	},
@@ -45,7 +45,7 @@ var CommandList = map[string]Command{
 			"<empty>": "Swap to a profile depending on the active one (via menu, active or hotswap)",
 			"menu": "Swap to a profile using the menu",
 			"hotswap": "Swap to a profile using hotswap",
-			"to <name>": "Swap to a specific profile",
+			"to <profile>": "Swap to a specific profile",
 		},
 		NerdStuff: "This just calls the swap command handler which interprets the args and based on the first arg we determine if we want to swap to a specific profile or if we want to swap to the next profile in the list (or use the menu depends on the config). If a second arg is provided we will pass it to the function as well.",
 	},
@@ -55,16 +55,13 @@ var CommandList = map[string]Command{
 		Description: "Manage the configuration file",
 		Usage: "config <command> [options]",
 		Params: map[string]string{
-			"edit": "Edit the configuration file",
+			"show": "Show the current configuration",
 			"reset": "Reset the configuration file to default",
-			"get <key>": "Get a value from the configuration file",
-			"set <key> <value>": "Set a value in the configuration file",
-			"list": "List all values in the configuration file",
 			"open": "Open the configuration file in the default editor",
-			"save": "Save the configuration file", // @note: Not needed since it is saved automatically, but im sure it will be useful in the future
-			"load": "Load the configuration file", // @note: Kinda useless for now but it might be useful in the future
 			"backup <path>": "Backup the configuration file", 
 			"restore <path>": "Restore the configuration file from backup",
+			// "save": "Save the configuration file", // @note: Not needed since it is saved automatically, but im sure it will be useful in the future
+			// "load": "Load the configuration file", // @note: Kinda useless for now but it might be useful in the future
 		},
 		NerdStuff: "This just calls the config command handler which interprets the args and based on the first arg we determine if we want to edit, reset, get, set, list, save, load, backup, restore or delete the config file. If a second arg is provided we will pass it to the function as well.",
 	},
