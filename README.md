@@ -7,7 +7,7 @@ A quick tool to switch between Git user profiles. Perfect for managing multiple 
 - Easily switch between multiple Git user profiles
 - Create, edit, and manage Git user profiles
 - List all available profiles
-- Quick swap between two commonly used profiles
+- Quick swap between profiles using menu or hotswap
 - Works with local Git repositories
 
 ## 🛠️ Technologies
@@ -47,43 +47,38 @@ build.cmd
 
 ## 🚀 Usage
 
+### Help Command
+Get help information for all commands or a specific command:
+```bash
+git-hotswap help           # Show minimized help information for all commands
+git-hotswap help <command> # Show detailed help information for a specific command
+```
+
 ### Managing Profiles
-
-Add a new profile:
 ```bash
-git-hotswap profile add --key work --name "John Doe" --email "john.doe@company.com"
-```
-
-List all profiles:
-```bash
-git-hotswap profile list
-```
-
-Remove a profile:
-```bash
-git-hotswap profile remove --key work
-```
-
-Edit a profile:
-```bash
-git-hotswap profile edit --key work --name "John Smith" --email "john.smith@company.com"
-```
-
-Rename a profile:
-```bash
-git-hotswap profile rename --key work --new company
+git-hotswap profile create <profile>  # Create a new profile
+git-hotswap profile delete <profile>  # Delete a profile
+git-hotswap profile edit <profile>    # Edit a profile
+git-hotswap profile current          # Get the current profile
+git-hotswap profile list            # List all profiles
 ```
 
 ### Switching Profiles
-
-Switch to a specific profile:
 ```bash
-git-hotswap swap work
+git-hotswap swap          # Swap to a profile depending on the active one
+git-hotswap swap menu     # Swap to a profile using the menu
+git-hotswap swap hotswap  # Swap to a profile using hotswap
+git-hotswap swap to <profile>  # Swap to a specific profile
 ```
 
-Quick swap between two profiles (when only two profiles exist):
+### Configuration Management
 ```bash
-git-hotswap swap
+git-hotswap config show           # Show the current configuration
+git-hotswap config reset          # Reset the configuration file to default
+git-hotswap config open           # Open the configuration file in the default editor
+git-hotswap config backup <path>  # Backup the configuration file
+git-hotswap config restore <path> # Restore the configuration file from backup
+git-hotswap config swap_method <method> # Set the swap method (menu or hotswap)
 ```
 
 ## 🤝 Contributing
