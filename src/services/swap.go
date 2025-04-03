@@ -50,7 +50,6 @@ func SwapHandler(args []string, config types.Config) {
 					utils.Warning("Swap method is set to hotswap, but there are less than 2 profiles. Please change the swap method to 'menu' or add another profile.")
 				}
 				utils.Info("Defaulting to menu swap method.")
-				config.Preferences.SwapMethod = "menu"
 				MenuSwap(config)
 			} else {
 				HotSwap(config)
