@@ -28,7 +28,6 @@ var CommandList = map[string]Command{
 		Description: "Manage profiles",
 		Usage: "profile <command> [options]",
 		Params: map[string]string{
-			"default <name>":    "Set a profile as default",
 			"create <name>": "Create a new profile",
 			"delete <name>": "Delete a profile",
 			"edit <name>":   "Edit a profile",
