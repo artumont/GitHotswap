@@ -81,7 +81,7 @@ func DeleteProfile(profileName string, config types.Config) {
 			utils.Error("Profile not found.")
 		}
 	} else {
-		utils.Info("Profile deletion cancelled.")
+		utils.Error("Profile deletion cancelled.")
 	}
 }
 

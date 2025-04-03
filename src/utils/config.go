@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/artumont/GitHotswap/src/types"
@@ -96,5 +97,33 @@ func CreateConfig(filePath string, config types.Config) error {
 		return err
 	}
 
+	return nil
+}
+
+func OpenConfig() {
+    configPath := GetConfigPath()
+    cmd := exec.Command("cmd", "/c", "start", configPath)
+    if err := cmd.Run(); err != nil {
+        Error("Error opening config file:", err)
+	}
+}
+
+func BackupConfig(path string) error {
+	configPath := GetConfigPath()
+	path = filepath.Join(path, "config.json.backup")
+	cmd := exec.Command("cmd", "/c", "copy", configPath, path)
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func RestoreConfig(path string) error {
+	configPath := GetConfigPath()
+	path = filepath.Join(path, "config.json")
+	cmd := exec.Command("cmd", "/c", "copy", path, configPath)
+	if err := cmd.Run(); err != nil {
+		return err
+	}
 	return nil
 }

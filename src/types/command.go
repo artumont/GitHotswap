@@ -42,7 +42,7 @@ var CommandList = map[string]Command{
 		Description: "Swap the current profile with another",
 		Usage: "swap [options]",
 		Params: map[string]string{
-			"<empty>": "Swap to a profile depending on the active one (via menu, active or hotswap)",
+			"<empty>": "Swap to a profile depending on the active one (via menu or hotswap)",
 			"menu": "Swap to a profile using the menu",
 			"hotswap": "Swap to a profile using hotswap",
 			"to <profile>": "Swap to a specific profile",
@@ -60,6 +60,7 @@ var CommandList = map[string]Command{
 			"open": "Open the configuration file in the default editor",
 			"backup <path>": "Backup the configuration file", 
 			"restore <path>": "Restore the configuration file from backup",
+			"swap_method <method>": "Set the swap method to use (menu or hotswap)",
 			// "save": "Save the configuration file", // @note: Not needed since it is saved automatically, but im sure it will be useful in the future
 			// "load": "Load the configuration file", // @note: Kinda useless for now but it might be useful in the future
 		},
