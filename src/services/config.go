@@ -70,7 +70,7 @@ func ChangeSwapMethod(swapMethod string, config types.Config) {
 		utils.Error("Invalid swap method. Please choose 'menu' or 'hotswap'.")
 		return
 	}
-	
+
 	if err := utils.SaveConfig(config); err != nil {
 		utils.Error("Error saving configuration: ", err)
 		return

@@ -29,8 +29,8 @@ func LoadConfig() (types.Config, error) {
 	if err != nil {
 		Warning("File not found, creating new config file")
 		config := types.Config{
-			FirstRun:   true,
-			Profiles:   make(map[string]types.Profile),
+			FirstRun:    true,
+			Profiles:    make(map[string]types.Profile),
 			Preferences: types.Preferences{SwapMethod: "menu"},
 		}
 		if err := CreateConfig(filePath, config); err != nil {
@@ -49,7 +49,7 @@ func LoadConfig() (types.Config, error) {
 		}
 		return config, err
 	}
-    
+
 	if config.Profiles == nil {
 		config.Profiles = make(map[string]types.Profile)
 	}
@@ -101,10 +101,10 @@ func CreateConfig(filePath string, config types.Config) error {
 }
 
 func OpenConfig() {
-    configPath := GetConfigPath()
-    cmd := exec.Command("cmd", "/c", "start", configPath)
-    if err := cmd.Run(); err != nil {
-        Error("Error opening config file:", err)
+	configPath := GetConfigPath()
+	cmd := exec.Command("cmd", "/c", "start", configPath)
+	if err := cmd.Run(); err != nil {
+		Error("Error opening config file:", err)
 	}
 }
 

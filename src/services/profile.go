@@ -54,7 +54,7 @@ func ProfileHandler(args []string, config types.Config) {
 }
 
 func CreateProfile(profileName string, config types.Config) {
-	profile := types.Profile {
+	profile := types.Profile{
 		User:  utils.Input("Enter your Git username: "),
 		Email: utils.Input("Enter your Git email: "),
 	}
@@ -121,7 +121,7 @@ func EditProfile(profileName string, config types.Config) {
 func ListProfiles(config types.Config) {
 	for name, profile := range config.Profiles {
 		utils.Info("Profile Name: " + name)
-		utils.Custom(color.HiCyanString("   •"), "User: ",  profile.User)
+		utils.Custom(color.HiCyanString("   •"), "User: ", profile.User)
 		utils.Custom(color.HiCyanString("   •"), "Email: ", profile.Email)
 	}
 }

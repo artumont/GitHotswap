@@ -40,7 +40,7 @@ func GetGitProfile() (string, string) {
 	gitPath := filepath.Join(cwd, ".git")
 
 	nameRegex := regexp.MustCompile(`name = (.+)`)
-    emailRegex := regexp.MustCompile(`email = (.+)`)
+	emailRegex := regexp.MustCompile(`email = (.+)`)
 
 	info, err := os.Stat(gitPath)
 	if err != nil {
@@ -60,7 +60,7 @@ func GetGitProfile() (string, string) {
 		return "", ""
 	}
 	defer file.Close()
-	
+
 	var lines []string
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -68,75 +68,75 @@ func GetGitProfile() (string, string) {
 	}
 
 	if err := scanner.Err(); err != nil {
-        Error("Error reading git config file:", err)
-        return "", ""
-    }
+		Error("Error reading git config file:", err)
+		return "", ""
+	}
 
 	for i := range lines {
 		if strings.Contains(lines[i], "[user]") {
 			if (i + 2) <= len(lines) {
-				name := lines[i + 1]
-				email := lines [i + 2]
+				name := lines[i+1]
+				email := lines[i+2]
 
 				if nameMatch := nameRegex.FindStringSubmatch(name); nameMatch != nil {
-                    if emailMatch := emailRegex.FindStringSubmatch(email); emailMatch != nil {
-                        return nameMatch[1], emailMatch[1]
-                    }
-                }
+					if emailMatch := emailRegex.FindStringSubmatch(email); emailMatch != nil {
+						return nameMatch[1], emailMatch[1]
+					}
+				}
 			}
 		}
 	}
-	
+
 	return "", ""
 }
 
 func ChangeGitProfile(name string, email string) error {
-    cwd := GetCwd()
-    gitPath := filepath.Join(cwd, ".git")
+	cwd := GetCwd()
+	gitPath := filepath.Join(cwd, ".git")
 
-    info, err := os.Stat(gitPath)
-    if err != nil {
-        Warning("No git repository found")
-        return err
-    }
+	info, err := os.Stat(gitPath)
+	if err != nil {
+		Warning("No git repository found")
+		return err
+	}
 
-    if !info.IsDir() {
-        Warning("No git repository found")
-        return fmt.Errorf("no git repository found")
-    }
+	if !info.IsDir() {
+		Warning("No git repository found")
+		return fmt.Errorf("no git repository found")
+	}
 
-    gitConfigFile := filepath.Join(gitPath, "config")
-    
-    content, err := os.ReadFile(gitConfigFile)
-    if err != nil {
-        Error("Error reading git config file:", err)
-        return err
-    }
+	gitConfigFile := filepath.Join(gitPath, "config")
 
-    lines := strings.Split(string(content), "\n")
-    var newLines []string
-    skipNext := 0
+	content, err := os.ReadFile(gitConfigFile)
+	if err != nil {
+		Error("Error reading git config file:", err)
+		return err
+	}
 
-    for i := 0; i < len(lines); i++ {
-        if skipNext > 0 {
-            skipNext--
-            continue
-        }
+	lines := strings.Split(string(content), "\n")
+	var newLines []string
+	skipNext := 0
 
-        if strings.Contains(lines[i], "[user]") {
-            skipNext = 2
-            continue
-        }
-        newLines = append(newLines, lines[i])
-    }
+	for i := 0; i < len(lines); i++ {
+		if skipNext > 0 {
+			skipNext--
+			continue
+		}
 
-    newLines = append(newLines, fmt.Sprintf("[user]\n\tname = %s\n\temail = %s", name, email))
+		if strings.Contains(lines[i], "[user]") {
+			skipNext = 2
+			continue
+		}
+		newLines = append(newLines, lines[i])
+	}
 
-    err = os.WriteFile(gitConfigFile, []byte(strings.Join(newLines, "\n")), 0644)
-    if err != nil {
-        Error("Error writing to git config file:", err)
-        return err
-    }
+	newLines = append(newLines, fmt.Sprintf("[user]\n\tname = %s\n\temail = %s", name, email))
+
+	err = os.WriteFile(gitConfigFile, []byte(strings.Join(newLines, "\n")), 0644)
+	if err != nil {
+		Error("Error writing to git config file:", err)
+		return err
+	}
 
 	return nil
 }

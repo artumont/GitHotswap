@@ -15,7 +15,7 @@ func main() {
 		utils.Error("Error loading config:", err)
 		os.Exit(0)
 	}
-	
+
 	services.CheckFirstRun(config)
 
 	if len(args) >= 1 {

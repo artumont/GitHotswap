@@ -26,8 +26,8 @@ func FirstRunProtocol(config types.Config) {
 			username := utils.Input("Enter your Git username: ")
 			email := utils.Input("Enter your Git email: ")
 			profile := types.Profile{
-				User:     username,
-				Email:    email,
+				User:  username,
+				Email: email,
 			}
 			config.Profiles[profileName] = profile
 			utils.Info("Profile created successfully.")

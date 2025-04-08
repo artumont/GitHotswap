@@ -3,8 +3,8 @@ package utils
 import (
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/artumont/GitHotswap/src/types"
+	"github.com/fatih/color"
 )
 
 func Info(args ...any) {

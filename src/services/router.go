@@ -16,7 +16,7 @@ func Route(args []string, config types.Config) {
 	case types.CommandList["config"].Identifier:
 		ConfigHandler(args[1:], config)
 	default:
-		utils.Error("Unknown command: '" + args[0], "' | use git-hotswap help for more information")
+		utils.Error("Unknown command: '"+args[0], "' | use git-hotswap help for more information")
 		return
 	}
 }
