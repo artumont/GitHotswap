@@ -40,7 +40,7 @@ func Menu(options []string, prompt string) int {
 
 	selection := 0
 	for {
-		fmt.Print("\033[H\033[2J")
+		fmt.Print("\033[H\033[2J") // @note: clear the console
 
 		fmt.Println(prompt)
 
