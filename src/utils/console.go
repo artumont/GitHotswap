@@ -58,7 +58,7 @@ func Menu(options []string, prompt string) int {
 		os.Stdin.Read(buf)
 
 		if buf[0] == escapeKey && buf[1] == '[' { // @note: Arrow keys send 3 bytes [( 27 aka "esc" ), ( 91 aka "[" ), {keycode}]
-			switch buf[2] { 
+			switch buf[2] {
 			case arrowUp:
 				if selection > 0 {
 					selection--
