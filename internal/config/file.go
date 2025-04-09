@@ -41,7 +41,7 @@ func SaveConfig(config Config) {
 			}
 		}
 	}
-	
+
 	ui.Error("Failed to save config file.")
 }
 
