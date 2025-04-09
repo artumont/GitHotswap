@@ -29,3 +29,7 @@ func Debug(args ...any) {
 func Custom(prefix string, args ...any) {
 	fmt.Printf("%s  %s \n", prefix, color.WhiteString(fmt.Sprint(args...)))
 }
+
+func Clear() {
+	fmt.Print("\033[H\033[2J")
+}
