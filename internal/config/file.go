@@ -4,45 +4,57 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+)
 
-	"github.com/artumont/GitHotswap/internal/ui"
+var (
+	defaultConfig Config = Config{
+		FirstRun: true,
+		Profiles: map[string]Profile{},
+		Preferences: Preferences{
+			SwapMethod: "menu",
+		},
+	}
 )
 
 // @method: Public
-func LoadConfig() Config {
-	if err := ensureConfigDir(); err == nil {
-		path := getConfigPath()
-		if file, err := os.Open(path); err == nil {
-			defer file.Close()
-			var config Config
-			decoder := json.NewDecoder(file)
-			if err := decoder.Decode(&config); err == nil {
-				ui.Success("Successfully loaded config file.")
-				return config
-			}
-		}
+func LoadConfig() (Config, error) {
+	if err := ensureConfigDir(); err != nil {
+		return defaultConfig, err
 	}
 
-	ui.Warning("Config file not found.")
-	createConfig()
-	return Config{}
+	path := getConfigPath()
+	file, err := os.Open(path)
+	if err != nil && os.IsNotExist(err) {
+		if err := createConfig(); err != nil {
+			return defaultConfig, err
+		}
+		return defaultConfig, nil
+	}
+	defer file.Close()
+
+	var config Config
+	if err := json.NewDecoder(file).Decode(&config); err != nil {
+		return defaultConfig, err
+	}
+
+	return config, nil
 }
 
-func SaveConfig(config Config) {
-	if err := ensureConfigDir(); err == nil {
-		path := getConfigPath()
-		if file, err := os.Open(path); err == nil {
-			defer file.Close()
-			encoder := json.NewEncoder(file)
-			encoder.SetIndent("", "    ")
-			if err := encoder.Encode(config); err == nil {
-				ui.Success("Successfully saved config file.")
-				return
-			}
-		}
+func SaveConfig(config Config) error {
+	if err := ensureConfigDir(); err != nil {
+		return err
 	}
 
-	ui.Error("Failed to save config file.")
+	path := getConfigPath()
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "    ")
+	return encoder.Encode(config)
 }
 
 // @method: Private
@@ -56,17 +68,16 @@ func ensureConfigDir() error {
 	return os.MkdirAll(configDir, 0755)
 }
 
-func createConfig() {
-	path := filepath.Join(getConfigPath(), "config.json")
-	if file, err := os.Create(path); err == nil {
-		defer file.Close()
-		encoder := json.NewEncoder(file)
-		encoder.SetIndent("", "    ")
-		if err := encoder.Encode(Config{}); err == nil {
-			ui.Success("Successfully created config file.")
-			return
-		}
-	}
+func createConfig() error {
+	path := getConfigPath()
 
-	ui.Error("Failed to create config file.")
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "    ")
+	return encoder.Encode(defaultConfig)
 }
