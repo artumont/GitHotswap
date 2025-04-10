@@ -7,16 +7,22 @@ import (
 )
 
 var (
-	defaultConfig Config = Config{
-		FirstRun: true,
-		Profiles: map[string]Profile{},
-		Preferences: Preferences{
-			SwapMethod: "menu",
-		},
-	}
+    defaultConfig Config = Config{
+        FirstRun: true,
+        Profiles: map[string]Profile{},
+        Preferences: Preferences{
+            SwapMethod: "menu",
+        },
+    }
+    configDir string = ""
 )
 
+
 // @method: Public
+func SetConfigDir(dir string) { // @note: Used for testing purposes
+    configDir = dir
+}
+
 func LoadConfig() (Config, error) {
 	if err := ensureConfigDir(); err != nil {
 		return defaultConfig, err
@@ -41,31 +47,35 @@ func LoadConfig() (Config, error) {
 }
 
 func SaveConfig(config Config) error {
-	if err := ensureConfigDir(); err != nil {
-		return err
-	}
+    if err := ensureConfigDir(); err != nil {
+        return err
+    }
 
-	path := getConfigPath()
-	file, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+    path := getConfigPath()
+    file, err := os.Create(path)
+    if err != nil {
+        return err
+    }
+    defer file.Close()
 
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "    ")
-	return encoder.Encode(config)
+    encoder := json.NewEncoder(file)
+    encoder.SetIndent("", "    ")
+    return encoder.Encode(config)
 }
 
 // @method: Private
 func getConfigPath() string {
-	configDir := filepath.Join(os.Getenv("APPDATA"), "GitHotswap")
-	return filepath.Join(configDir, "config.json")
+    if configDir == "" {
+        configDir = filepath.Join(os.Getenv("APPDATA"), "GitHotswap")
+    }
+    return filepath.Join(configDir, "config.json")
 }
 
 func ensureConfigDir() error {
-	configDir := filepath.Join(os.Getenv("APPDATA"), "GitHotswap")
-	return os.MkdirAll(configDir, 0755)
+    if configDir == "" {
+        configDir = filepath.Join(os.Getenv("APPDATA"), "GitHotswap")
+    }
+    return os.MkdirAll(configDir, 0755)
 }
 
 func createConfig() error {

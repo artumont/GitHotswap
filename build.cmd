@@ -1,3 +1,3 @@
 @echo off
-go build -o ./bin/git-hotswap.exe ./cmd/git-hotswap
+go build -v -o ./bin/git-hotswap.exe ./cmd/git-hotswap
 @echo on

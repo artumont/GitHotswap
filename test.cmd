@@ -1,0 +1,3 @@
+@echo off
+go test ./test/...
+@echo on
