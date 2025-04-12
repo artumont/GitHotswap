@@ -113,6 +113,6 @@ func validateProfile(profile config.Profile) error {
 	return nil
 }
 
-func writeConfigFile(configPath string, content []string) error {
+func writeConfigFile(configPath string, content []string) error { // @todo: Add some sort of backup system to avoid accidental data deletion
 	return os.WriteFile(configPath, []byte(strings.Join(content, "\n")+"\n"), 0644)
 }
