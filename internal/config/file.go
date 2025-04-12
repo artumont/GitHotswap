@@ -2,25 +2,25 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 )
 
 var (
-    defaultConfig Config = Config{
-        FirstRun: true,
-        Profiles: map[string]Profile{},
-        Preferences: Preferences{
-            SwapMethod: "menu",
-        },
-    }
-    configDir string = ""
+	defaultConfig Config = Config{
+		FirstRun: true,
+		Profiles: map[string]Profile{},
+		Preferences: Preferences{
+			SwapMethod: "menu",
+		},
+	}
+	configDir string = ""
 )
-
 
 // @method: Public
 func SetConfigDir(dir string) { // @note: Used for testing purposes
-    configDir = dir
+	configDir = dir
 }
 
 func LoadConfig() (Config, error) {
@@ -46,36 +46,40 @@ func LoadConfig() (Config, error) {
 	return config, nil
 }
 
-func SaveConfig(config Config) error {
-    if err := ensureConfigDir(); err != nil {
-        return err
-    }
+func SaveConfig(config *Config) error {
+	if config == nil {
+		return errors.New("config cannot be nil")
+	}
 
-    path := getConfigPath()
-    file, err := os.Create(path)
-    if err != nil {
-        return err
-    }
-    defer file.Close()
+	if err := ensureConfigDir(); err != nil {
+		return err
+	}
 
-    encoder := json.NewEncoder(file)
-    encoder.SetIndent("", "    ")
-    return encoder.Encode(config)
+	path := getConfigPath()
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "    ")
+	return encoder.Encode(config)
 }
 
 // @method: Private
 func getConfigPath() string {
-    if configDir == "" {
-        configDir = filepath.Join(os.Getenv("APPDATA"), "GitHotswap")
-    }
-    return filepath.Join(configDir, "config.json")
+	if configDir == "" {
+		configDir = filepath.Join(os.Getenv("APPDATA"), "GitHotswap")
+	}
+	return filepath.Join(configDir, "config.json")
 }
 
 func ensureConfigDir() error {
-    if configDir == "" {
-        configDir = filepath.Join(os.Getenv("APPDATA"), "GitHotswap")
-    }
-    return os.MkdirAll(configDir, 0755)
+	if configDir == "" {
+		configDir = filepath.Join(os.Getenv("APPDATA"), "GitHotswap")
+	}
+	return os.MkdirAll(configDir, 0755)
 }
 
 func createConfig() error {

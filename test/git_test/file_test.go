@@ -31,31 +31,31 @@ func TestProfileChange(t *testing.T) {
 
 // @method: Utils
 func setupTestEnviroment(t *testing.T) {
-    var err error
-    testDir, err = os.MkdirTemp("", "githotswap-test-*")
-    if err != nil {
-        t.Fatalf("Failed to create test directory: %v", err)
-    }
+	var err error
+	testDir, err = os.MkdirTemp("", "githotswap-test-*")
+	if err != nil {
+		t.Fatalf("Failed to create test directory: %v", err)
+	}
 
-    gitDir := filepath.Join(testDir, ".git")
-    if err := os.Mkdir(gitDir, 0777); err != nil {
-        t.Fatalf("Failed to create .git directory: %v", err)
-    }
+	gitDir := filepath.Join(testDir, ".git")
+	if err := os.Mkdir(gitDir, 0777); err != nil {
+		t.Fatalf("Failed to create .git directory: %v", err)
+	}
 
 	configPath := filepath.Join(gitDir, "config")
-    if err := setupDummyConfig(configPath); err != nil {
+	if err := setupDummyConfig(configPath); err != nil {
 		t.Fatalf("Failed to create dummy config: %v", err)
-    }
+	}
 
 	if err := os.Chmod(gitDir, 0755); err != nil {
-        t.Fatalf("Failed to set .git directory permissions: %v", err)
-    }
+		t.Fatalf("Failed to set .git directory permissions: %v", err)
+	}
 
-    if err := os.Chmod(configPath, 0644); err != nil {
-        t.Fatalf("Failed to set config file permissions: %v", err)
-    }
+	if err := os.Chmod(configPath, 0644); err != nil {
+		t.Fatalf("Failed to set config file permissions: %v", err)
+	}
 
-    git.SetupWorkingDir(testDir)
+	git.SetupWorkingDir(testDir)
 }
 
 func setupDummyConfig(path string) error {

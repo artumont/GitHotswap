@@ -7,11 +7,11 @@ import (
 )
 
 // @method: Public
-func CheckFirstRun(config Config) {
+func CheckFirstRun(config *Config) {
 	if config.FirstRun {
 		if response := ui.Input("First run detected. Do you want to set up your profiles? (y/n)"); strings.ToLower(response) == "y" {
 			ui.Info("Setting up profile...")
-			firstRunProtocol(&config)
+			firstRunProtocol(config)
 		} else {
 			ui.Warning("Skipping profile setup.")
 		}
