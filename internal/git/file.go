@@ -1,33 +1,109 @@
 package git
 
 import (
+	"bufio"
 	"errors"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/artumont/GitHotswap/internal/config"
 )
 
 var (
-	nameRegex *regexp.Regexp = regexp.MustCompile( `name = (.+)`)
+	nameRegex  *regexp.Regexp = regexp.MustCompile(`name = (.+)`)
 	emailRegex *regexp.Regexp = regexp.MustCompile(`email = (.+)`)
+	workingDir string         = ""
 )
 
 // @method: Public
-func ChangeGitProfile(profile config.Profile) {
-	
+func SetupWorkingDir(dir string) {
+	workingDir = dir
+}
+
+func ChangeGitProfile(profile config.Profile) error {
+	if err := validateProfile(profile); err != nil {
+		return err
+	}
+
+	dir, err := getGitPath()
+	if err != nil {
+		return err
+	}
+
+	configPath, err := getGitConfig(dir)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Open(configPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	var (
+		lines      []string
+		foundUser  bool = false
+		foundName  bool = false
+		foundEmail bool = false
+	)
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		switch {
+		case line == "[user]":
+			foundUser = true
+		case nameRegex.MatchString(line):
+			line = "\tname = " + profile.User
+			foundName = true
+		case emailRegex.MatchString(line):
+			line = "\temail = " + profile.Email
+			foundEmail = true
+		}
+		lines = append(lines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
+	if !foundUser {
+		lines = append(lines, "\n[user]")
+	}
+	if !foundName {
+		lines = append(lines, "\tname = "+profile.User)
+	}
+	if !foundEmail {
+		lines = append(lines, "\temail = "+profile.Email)
+	}
+
+	return writeConfigFile(configPath, lines)
 }
 
 // @method: Private
-func getGitPath() string {
-	if cwd, err := os.Getwd(); err == nil {
-		gitDir := filepath.Join(cwd, ".git")
-		if _, err := os.Stat(gitDir); err == nil {
-			return gitDir
+func getGitPath() (string, error) {
+	cwd, err := os.Getwd()
+	if workingDir != "" {
+		cwd = workingDir
+	}
+
+	if err == nil {
+		dir := filepath.Join(cwd, ".git")
+		_, err := os.Stat(dir)
+		if err == nil {
+			return dir, nil
 		}
 	}
-	return ""
+	return "", err
+}
+
+func getGitConfig(dir string) (string, error) {
+	path := filepath.Join(dir, "config")
+	_, err := os.Stat(path)
+	return path, err
 }
 
 func validateProfile(profile config.Profile) error {
@@ -35,4 +111,8 @@ func validateProfile(profile config.Profile) error {
 		return errors.New("profile is not valid")
 	}
 	return nil
+}
+
+func writeConfigFile(configPath string, content []string) error {
+	return os.WriteFile(configPath, []byte(strings.Join(content, "\n")+"\n"), 0644)
 }
