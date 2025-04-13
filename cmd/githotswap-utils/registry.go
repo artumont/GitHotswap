@@ -8,6 +8,12 @@ import (
 func RegistryInit(r *router.Router) {
 	r.RegisterHandler(
 		"profile",
-		handlers.NewProfileHandler(r.Cfg),
+		handlers.NewProfileHandler(r.GetConfig()),
+	)
+
+	// @note: the 'help' command should be the last one registered as it is the one that holds all the command data.
+	r.RegisterHandler(
+		"help",
+		handlers.NewHelpHandler(r.GetCommands()),
 	)
 }

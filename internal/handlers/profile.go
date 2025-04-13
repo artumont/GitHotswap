@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/artumont/GitHotswap/internal/config"
+	"github.com/artumont/GitHotswap/internal/router"
 )
 
 type ProfileHandler struct {
@@ -16,4 +17,10 @@ func NewProfileHandler(cfg *config.Config) *ProfileHandler {
 
 func (p *ProfileHandler) Handle(args []string) error {
 	return nil
+}
+
+func (p *ProfileHandler) GetCommandData() router.Command {
+	return router.Command{
+		// @todo: Add description and usage.
+	}
 }
