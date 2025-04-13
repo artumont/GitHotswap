@@ -7,13 +7,13 @@ import (
 )
 
 type Router struct {
-	cfg      *config.Config // @note: Not used right now but may be useful in the future
+	Cfg      *config.Config
 	handlers map[string]CommandHandler
 }
 
 func NewRouter(cfg *config.Config) *Router {
 	return &Router{
-		cfg:      cfg,
+		Cfg:      cfg,
 		handlers: make(map[string]CommandHandler),
 	}
 }
