@@ -21,6 +21,29 @@ func (p *ProfileHandler) Handle(args []string) error {
 
 func (p *ProfileHandler) GetCommandData() router.Command {
 	return router.Command{
-		// @todo: Add description and usage.
+		Name: "Profile",
+		Description: "Every operation that is related to the user profile.",
+		Subcommands: []router.Subcommand{
+			{
+				Usage: "create <profile>",
+				Description: "Creates a new profile.",
+			},
+			{
+				Usage: "edit <profile>",
+				Description: "Edits a profile.",
+			},
+			{
+				Usage: "delete <profile>",
+				Description: "Deletes a profile.",
+			},
+			{
+				Usage: "list",
+				Description: "Lists all profiles.",
+			},
+			{
+				Usage: "current",
+				Description: "Shows the current profile.",
+			},
+		},
 	}
 }

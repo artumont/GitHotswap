@@ -3,8 +3,7 @@ package router
 type Command struct {
 	Name        string
 	Description string
-	NerdStuff   string
-	Subcommands []Subcommand
+	Subcommands []Subcommand // @note: Also called parameters but subcommands sound better
 }
 
 type Subcommand struct {
