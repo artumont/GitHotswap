@@ -5,10 +5,10 @@ import (
 )
 
 type HelpHandler struct {
-	cmds *[]router.Command
+	cmds *map[string]router.Command
 }
 
-func NewHelpHandler(cmds *[]router.Command) *HelpHandler {
+func NewHelpHandler(cmds *map[string]router.Command) *HelpHandler {
 	return &HelpHandler{
 		cmds: cmds, // @note: This are all the loaded commands in the registry.
 	}

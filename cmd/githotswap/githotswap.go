@@ -12,6 +12,10 @@ import (
 func main() {
 	var err error
 	args := os.Args[1:]
+	if len(args) < 1 {
+		ui.Error("Incorrect usage | Usage: git-hotswap <command> [<args>] | use 'git-hotswap help' for more information.")
+		os.Exit(1)
+	}
 
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -23,7 +27,7 @@ func main() {
 
 	err = router.Route(args[0], args[1:])
 	if err != nil {
-		ui.Fatal("Got a fatal error: ", err)
+		ui.Error("Got a fatal error while routing the command: ", err.Error())
 		os.Exit(1)
 	}
 

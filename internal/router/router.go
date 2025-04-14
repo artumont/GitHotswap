@@ -9,14 +9,14 @@ import (
 type Router struct {
 	cfg      *config.Config
 	handlers map[string]CommandHandler
-	commands []Command // @note: Command cache, used in the help handler
+	commands map[string]Command // @note: Command cache, used in the help handler
 }
 
 func NewRouter(cfg *config.Config) *Router {
 	return &Router{
 		cfg:      cfg,
 		handlers: make(map[string]CommandHandler),
-		commands: make([]Command, 0),
+		commands: make(map[string]Command, 0),
 	}
 }
 
@@ -25,11 +25,11 @@ func (r *Router) RegisterHandler(cmd string, handler CommandHandler) error {
 		return errors.New("handler already registered for command")
 	}
 	r.handlers[cmd] = handler
-	r.commands = append(r.commands, handler.GetCommandData())
+	r.commands[cmd] = handler.GetCommandData()
 	return nil
 }
 
-func (r *Router) GetCommands() *[]Command {
+func (r *Router) GetCommands() *map[string]Command {
 	return &r.commands
 }
 
