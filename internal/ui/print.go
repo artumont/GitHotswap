@@ -22,10 +22,6 @@ func Error(args ...any) {
 	fmt.Printf("%s  %s \n", color.HiRedString("✗"), color.WhiteString(fmt.Sprint(args...)))
 }
 
-func Fatal(args ...any) {
-	fmt.Printf("%s  %s \n", color.RGB(255, 127, 80).Sprint("☢"), color.WhiteString(fmt.Sprint(args...)))
-}
-
 func Debug(args ...any) {
 	fmt.Printf("%s  %s \n", color.HiMagentaString("⚙"), color.WhiteString(fmt.Sprint(args...)))
 }
