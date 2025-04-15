@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"github.com/artumont/GitHotswap/internal/router"
+	"github.com/artumont/GitHotswap/internal/ui"
+	"github.com/fatih/color"
 )
 
 type HelpHandler struct {
@@ -15,7 +17,11 @@ func NewHelpHandler(cmds *map[string]router.Command) *HelpHandler {
 }
 
 func (h *HelpHandler) Handle(args []string) error {
-	return nil
+	if len(args) > 0 {
+		return h.PrintOneCommand(args[0])
+	} else {
+		return h.PrintAllCommands()
+	}
 }
 
 func (h *HelpHandler) GetCommandData() router.Command {
@@ -33,4 +39,34 @@ func (h *HelpHandler) GetCommandData() router.Command {
 			},
 		},
 	}
+}
+
+// @method: Public
+// @note: They are public because they are used in the tests. (it should be like that on all handlers)
+func (h *HelpHandler) PrintAllCommands() error {
+	ui.Info("Available commands:")
+	for _, cmd := range *h.cmds {
+		ui.Custom(color.HiMagentaString("  ➣"), cmd.Name)
+		ui.Custom(color.CyanString("     Description:"), cmd.Description)
+		ui.Custom(color.HiGreenString("     Subcommands:"))
+		for _, subcmd := range cmd.Subcommands {
+			ui.Custom(color.YellowString("       • "+subcmd.Usage+":"), subcmd.Description)
+		}
+	}
+
+	return nil
+}
+
+func (h *HelpHandler) PrintOneCommand(name string) error {
+	cmd := (*h.cmds)[name]
+
+	ui.Info("Command Info:")
+	ui.Custom(color.HiMagentaString("  ➣"), cmd.Name)
+	ui.Custom(color.CyanString("     Description:"), cmd.Description)
+	ui.Custom(color.HiGreenString("     Subcommands:"))
+	for _, subcmd := range cmd.Subcommands {
+		ui.Custom(color.YellowString("       • "+subcmd.Usage+":"), subcmd.Description)
+	}
+
+	return nil
 }
