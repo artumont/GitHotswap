@@ -7,33 +7,42 @@ import (
 )
 
 // @method: Public
-func CheckFirstRun(config *Config) {
-	if config.FirstRun {
-		if response := ui.Input("First run detected. Do you want to set up your profiles? (y/n)"); strings.ToLower(response) == "y" {
-			ui.Info("Setting up profile...")
-			firstRunProtocol(config)
-		} else {
-			ui.Warning("Skipping profile setup.")
-		}
-
-		config.FirstRun = false
-		SaveConfig(config)
+func CheckFirstRun(cfg *Config) error {
+	if !cfg.FirstRun {
+		ui.Warning("Skipping first run protocol.")
+		return nil
 	}
+	
+	sure := ui.Input("Do you want to run the first run protocol? (y/n): ", true)
+	if strings.ToLower(sure) != "y" {
+		ui.Warning("Skipping profile setup.")
+		return nil
+	}
+
+	firstRunProtocol(cfg)
+
+	cfg.FirstRun = false
+	if err := SaveConfig(cfg); err != nil {
+		return err
+	}
+	
+	return nil
 }
 
 // @method: Private
-func firstRunProtocol(config *Config) {
-	profileName := ui.Input("Enter your profile name:")
-	if _, exists := config.Profiles[profileName]; !exists {
-		username := ui.Input("Enter your username:")
-		email := ui.Input("Enter your email:")
-		config.Profiles[profileName] = Profile{
-			User:  username,
-			Email: email,
-		}
-		ui.Success("Profile created successfully!")
-	} else {
+func firstRunProtocol(cfg *Config) {
+	profileName := ui.Input("Enter your profile name: ", true)
+
+	_, exists := cfg.Profiles[profileName]
+	if exists {
 		ui.Error("Profile already exists. Please choose a different name.")
-		firstRunProtocol(config)
+		firstRunProtocol(cfg)
 	}
+
+	cfg.Profiles[profileName] = Profile{
+		User:  ui.Input("Enter your username: ", true),
+		Email: ui.Input("Enter your email: ", true),
+	}
+
+	ui.Success("Profile created successfully!")
 }
