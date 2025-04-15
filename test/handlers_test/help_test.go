@@ -40,6 +40,7 @@ var (
 	}
 )
 
+// @method: Tests
 func TestHelpCommands(t *testing.T) {
 	help := handlers.NewHelpHandler(&testCmds)
 	t.Run("AllComands", func(t *testing.T) {
