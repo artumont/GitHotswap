@@ -1,8 +1,13 @@
 package handlers
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/artumont/GitHotswap/internal/config"
 	"github.com/artumont/GitHotswap/internal/router"
+	"github.com/artumont/GitHotswap/internal/ui"
+	"github.com/fatih/color"
 )
 
 type ProfileHandler struct {
@@ -16,7 +21,32 @@ func NewProfileHandler(cfg *config.Config) *ProfileHandler {
 }
 
 func (p *ProfileHandler) Handle(args []string) error {
-	return nil
+	switch args[0] {
+	case "create":
+		if len(args) < 2 {
+			ui.Error("Usage: profile create <profile>")
+			return nil
+		}
+		return p.CreateProfile(args[1])
+	case "edit":
+		if len(args) < 2 {
+			ui.Error("Usage: profile edit <profile>")
+			return nil
+		}
+		return p.EditProfile(args[1])
+	case "delete":
+		if len(args) < 2 {
+			ui.Error("Usage: profile delete <profile>")
+			return nil
+		}
+		return p.DeleteProfile(args[1])
+	case "list":
+		return p.ListProfiles()
+	default:
+		ui.Error("Unknown subcommand: " + args[0])
+		ui.Info("Usage: profile <create|edit|delete|list>")
+		return errors.New("unknown subcommand")
+	}
 }
 
 func (p *ProfileHandler) GetCommandData() router.Command {
@@ -40,10 +70,93 @@ func (p *ProfileHandler) GetCommandData() router.Command {
 				Usage: "list",
 				Description: "Lists all profiles.",
 			},
-			{
-				Usage: "current",
-				Description: "Shows the current profile.",
-			},
 		},
 	}
+}
+
+// @method: Public
+// @note: They are public because they are used in the tests. (it should be like that on all handlers)
+func (p *ProfileHandler) CreateProfile(profileName string) error {
+	profile := config.Profile{
+		User:  ui.Input("Enter your Git username: ", true),
+		Email: ui.Input("Enter your Git email: ", true),
+	}
+
+	p.cfg.Profiles[profileName] = profile
+
+	if err := config.SaveConfig(p.cfg); err != nil {
+		return err
+	}
+	
+	ui.Success("Profile created successfully!")
+	return nil
+}
+
+func (p *ProfileHandler) EditProfile(profileName string) error {
+	profile, exists := p.cfg.Profiles[profileName]
+	if !exists {
+		ui.Error("Profile does not exist.")
+		return errors.New("profile does not exist")
+	}
+
+	options := []string{"User: " + profile.User, "Email: " + profile.Email, "Both"}
+	field := ui.Menu(options, "Select a field to edit:")
+	switch field {
+	case 0:
+		profile.User = ui.Input("Enter new Git username: ", true)
+	case 1:
+		profile.Email = ui.Input("Enter new Git email: ", true)
+	case 2:
+		profile.User = ui.Input("Enter new Git username: ", true)
+		profile.Email = ui.Input("Enter new Git email: ", true)
+	case -1:
+		ui.Error("Operation cancelled")
+		return nil
+	}
+
+	p.cfg.Profiles[profileName] = profile
+
+	if err := config.SaveConfig(p.cfg); err != nil {
+		return err
+	}
+
+	ui.Success("Profile updated successfully!")
+	return nil
+}
+
+func (p *ProfileHandler) DeleteProfile(profileName string) error {
+	sure := ui.Input("Are you sure you want to delete this profile? (y/n): ", true)
+	if strings.ToLower(sure) != "y" {
+		ui.Error("Operation cancelled")
+		return nil
+	}
+
+	_, exists := p.cfg.Profiles[profileName]
+	if !exists {
+		ui.Error("Profile does not exist.")
+		return errors.New("profile does not exist")
+	}
+
+	delete(p.cfg.Profiles, profileName)
+
+	if err := config.SaveConfig(p.cfg); err != nil {
+		return err
+	}
+
+	ui.Success("Profile deleted successfully!")
+	return nil
+}
+
+func (p *ProfileHandler) ListProfiles() error {
+	for name, profile := range p.cfg.Profiles {
+		ui.Info("Profile Name: " + name)
+		ui.Custom(color.HiCyanString("   •"), "User: ", profile.User)
+		ui.Custom(color.HiCyanString("   •"), "Email: ", profile.Email)
+	}
+
+	return nil
+}
+
+func (p *ProfileHandler) CurrentProfile() error {
+	return nil
 }
