@@ -10,29 +10,29 @@ import (
 var (
 	testCmds map[string]router.Command = map[string]router.Command{
 		"test": {
-				Name: "Test",
-				Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-				Subcommands: []router.Subcommand{
+			Name:        "Test",
+			Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+			Subcommands: []router.Subcommand{
 				{
-					Usage: "lorem <ipsum>",
+					Usage:       "lorem <ipsum>",
 					Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
 				},
 				{
-					Usage: "dolor <sit>",
+					Usage:       "dolor <sit>",
 					Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
 				},
 			},
 		},
 		"test2": {
-				Name: "Test2",
-				Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-				Subcommands: []router.Subcommand{
+			Name:        "Test2",
+			Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+			Subcommands: []router.Subcommand{
 				{
-					Usage: "lorem <ipsum>",
+					Usage:       "lorem <ipsum>",
 					Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
 				},
 				{
-					Usage: "dolor <sit>",
+					Usage:       "dolor <sit>",
 					Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
 				},
 			},

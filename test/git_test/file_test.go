@@ -21,56 +21,56 @@ var (
 
 // @method: Tests
 func TestProfileChange(t *testing.T) {
-    t.Run("ValidProfileChange", func(t *testing.T) {
-        setupTestEnviroment(t)
-        defer cleanupTestEnviroment(t)
+	t.Run("ValidProfileChange", func(t *testing.T) {
+		setupTestEnviroment(t)
+		defer cleanupTestEnviroment(t)
 
-        if err := git.ChangeGitProfile(testProfile); err != nil {
-            t.Fatalf("Failed to change git profile: %v", err)
-        }
+		if err := git.ChangeGitProfile(testProfile); err != nil {
+			t.Fatalf("Failed to change git profile: %v", err)
+		}
 
-        configPath := filepath.Join(testDir, ".git", "config")
-        content, err := os.ReadFile(configPath)
-        if err != nil {
-            t.Fatalf("Failed to read git config: %v", err)
-        }
+		configPath := filepath.Join(testDir, ".git", "config")
+		content, err := os.ReadFile(configPath)
+		if err != nil {
+			t.Fatalf("Failed to read git config: %v", err)
+		}
 
-        configStr := string(content)
-        if !strings.Contains(configStr, "name = "+testProfile.User) {
-            t.Errorf("Git config does not contain user name %s", testProfile.User)
-        }
-        if !strings.Contains(configStr, "email = "+testProfile.Email) {
-            t.Errorf("Git config does not contain email %s", testProfile.Email)
-        }
-    })
+		configStr := string(content)
+		if !strings.Contains(configStr, "name = "+testProfile.User) {
+			t.Errorf("Git config does not contain user name %s", testProfile.User)
+		}
+		if !strings.Contains(configStr, "email = "+testProfile.Email) {
+			t.Errorf("Git config does not contain email %s", testProfile.Email)
+		}
+	})
 
-    t.Run("InvalidGitDirectory", func(t *testing.T) {
-        setupTestEnviroment(t)
-        defer cleanupTestEnviroment(t)
+	t.Run("InvalidGitDirectory", func(t *testing.T) {
+		setupTestEnviroment(t)
+		defer cleanupTestEnviroment(t)
 
-        gitDir := filepath.Join(testDir, ".git")
-        if err := os.RemoveAll(gitDir); err != nil {
-            t.Fatalf("Failed to remove .git directory: %v", err)
-        }
+		gitDir := filepath.Join(testDir, ".git")
+		if err := os.RemoveAll(gitDir); err != nil {
+			t.Fatalf("Failed to remove .git directory: %v", err)
+		}
 
-        if err := git.ChangeGitProfile(testProfile); err == nil {
-            t.Error("Expected error changing profile in non-git directory")
-        }
-    })
+		if err := git.ChangeGitProfile(testProfile); err == nil {
+			t.Error("Expected error changing profile in non-git directory")
+		}
+	})
 
-    t.Run("ReadOnlyGitConfig", func(t *testing.T) {
-        setupTestEnviroment(t)
-        defer cleanupTestEnviroment(t)
+	t.Run("ReadOnlyGitConfig", func(t *testing.T) {
+		setupTestEnviroment(t)
+		defer cleanupTestEnviroment(t)
 
-        configPath := filepath.Join(testDir, ".git", "config")
-        if err := os.Chmod(configPath, 0444); err != nil {
-            t.Fatalf("Failed to set git config as read-only: %v", err)
-        }
+		configPath := filepath.Join(testDir, ".git", "config")
+		if err := os.Chmod(configPath, 0444); err != nil {
+			t.Fatalf("Failed to set git config as read-only: %v", err)
+		}
 
-        if err := git.ChangeGitProfile(testProfile); err == nil {
-            t.Error("Expected error changing profile with read-only config")
-        }
-    })
+		if err := git.ChangeGitProfile(testProfile); err == nil {
+			t.Error("Expected error changing profile with read-only config")
+		}
+	})
 }
 
 // @method: Utils

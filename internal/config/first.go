@@ -15,7 +15,7 @@ func CheckFirstRun(cfg *Config) error {
 		ui.Warning("Skipping first run protocol.")
 		return nil
 	}
-	
+
 	sure := inputProvider.Prompt("Do you want to run the first run protocol? (y/n): ", true)
 	if strings.ToLower(sure) != "y" {
 		ui.Warning("Skipping profile setup.")
@@ -31,7 +31,7 @@ func CheckFirstRun(cfg *Config) error {
 	if err := SaveConfig(cfg); err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 

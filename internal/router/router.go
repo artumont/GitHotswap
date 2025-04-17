@@ -8,17 +8,17 @@ import (
 )
 
 type Router struct {
-	cfg      *config.Config
-	handlers map[string]CommandHandler
-	commands map[string]Command // @note: Command cache, used in the help handler
+	cfg           *config.Config
+	handlers      map[string]CommandHandler
+	commands      map[string]Command // @note: Command cache, used in the help handler
 	inputProvider input.InputProvider
 }
 
 func NewRouter(cfg *config.Config) *Router {
 	return &Router{
-		cfg:      cfg,
-		handlers: make(map[string]CommandHandler),
-		commands: make(map[string]Command, 0),
+		cfg:           cfg,
+		handlers:      make(map[string]CommandHandler),
+		commands:      make(map[string]Command, 0),
 		inputProvider: input.NewInputProvider(),
 	}
 }

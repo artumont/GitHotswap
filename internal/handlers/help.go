@@ -26,15 +26,15 @@ func (h *HelpHandler) Handle(args []string) error {
 
 func (h *HelpHandler) GetCommandData() router.Command {
 	return router.Command{
-		Name: "Help",
+		Name:        "Help",
 		Description: "Shows help for all commands.",
 		Subcommands: []router.Subcommand{
 			{
-				Usage: "<empty>",
+				Usage:       "<empty>",
 				Description: "Show minimized help information for all commands",
 			},
 			{
-				Usage: "<command>",
+				Usage:       "<command>",
 				Description: "Show detailed help information for a specific command",
 			},
 		},

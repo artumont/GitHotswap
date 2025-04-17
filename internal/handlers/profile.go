@@ -12,13 +12,13 @@ import (
 )
 
 type ProfileHandler struct {
-	cfg *config.Config
+	cfg           *config.Config
 	inputProvider input.InputProvider
 }
 
 func NewProfileHandler(cfg *config.Config, inputProvider input.InputProvider) *ProfileHandler {
 	return &ProfileHandler{
-		cfg: cfg,
+		cfg:           cfg,
 		inputProvider: inputProvider,
 	}
 }
@@ -54,23 +54,23 @@ func (p *ProfileHandler) Handle(args []string) error {
 
 func (p *ProfileHandler) GetCommandData() router.Command {
 	return router.Command{
-		Name: "Profile",
+		Name:        "Profile",
 		Description: "Every operation that is related to the user profile.",
 		Subcommands: []router.Subcommand{
 			{
-				Usage: "create <profile>",
+				Usage:       "create <profile>",
 				Description: "Creates a new profile.",
 			},
 			{
-				Usage: "edit <profile>",
+				Usage:       "edit <profile>",
 				Description: "Edits a profile.",
 			},
 			{
-				Usage: "delete <profile>",
+				Usage:       "delete <profile>",
 				Description: "Deletes a profile.",
 			},
 			{
-				Usage: "list",
+				Usage:       "list",
 				Description: "Lists all profiles.",
 			},
 		},
@@ -95,7 +95,7 @@ func (p *ProfileHandler) CreateProfile(profileName string) error {
 	if err := config.SaveConfig(p.cfg); err != nil {
 		return err
 	}
-	
+
 	ui.Success("Profile created successfully!")
 	return nil
 }
