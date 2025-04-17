@@ -1,37 +1,176 @@
 package handlers_test
 
 import (
-	"os"
-	"testing"
+    "testing"
 
-	"github.com/artumont/GitHotswap/internal/config"
-	"github.com/artumont/GitHotswap/internal/handlers"
-	"github.com/artumont/GitHotswap/test"
+    "github.com/artumont/GitHotswap/internal/config"
+    "github.com/artumont/GitHotswap/internal/handlers"
+    "github.com/artumont/GitHotswap/test"
 )
 
-var (
-	testDir string
-)
+func TestEditProfile(t *testing.T) {
+    t.Run("EditUsername", func(t *testing.T) {
+        cfg := test.SetupTestEnviroment(t)
+        defer test.CleanupTestEnviroment(t)
 
-// @method: Tests
+        mockInput := test.NewMockInputProvider([]string{
+            "User: test_user", 
+            "new_username",
+        })
+        profile := handlers.NewProfileHandler(cfg, mockInput)
+
+        err := profile.EditProfile("test")
+        if err != nil {
+            t.Errorf("EditProfile() error = %v", err)
+        }
+
+        if p := cfg.Profiles["test"]; p.User != "new_username" {
+            t.Errorf("User not updated, got %v", p.User)
+        }
+    })
+
+    t.Run("EditEmail", func(t *testing.T) {
+        cfg := test.SetupTestEnviroment(t)
+        defer test.CleanupTestEnviroment(t)
+
+        mockInput := test.NewMockInputProvider([]string{
+            "Email: test_email@email.com", 
+            "new_email@test.com",
+        })
+        profile := handlers.NewProfileHandler(cfg, mockInput)
+
+        err := profile.EditProfile("test")
+        if err != nil {
+            t.Errorf("EditProfile() error = %v", err)
+        }
+
+        if p := cfg.Profiles["test"]; p.Email != "new_email@test.com" {
+            t.Errorf("Email not updated, got %v", p.Email)
+        }
+    })
+
+    t.Run("EditBothFields", func(t *testing.T) {
+        cfg := test.SetupTestEnviroment(t)
+        defer test.CleanupTestEnviroment(t)
+
+        mockInput := test.NewMockInputProvider([]string{
+            "Both", 
+            "newer_user", 
+            "newer_email@test.com",
+        })
+        profile := handlers.NewProfileHandler(cfg, mockInput)
+
+        err := profile.EditProfile("test")
+        if err != nil {
+            t.Errorf("EditProfile() error = %v", err)
+        }
+
+        p := cfg.Profiles["test"]
+        if p.User != "newer_user" || p.Email != "newer_email@test.com" {
+            t.Errorf("User/Email not updated, got %v/%v", p.User, p.Email)
+        }
+    })
+
+    t.Run("NonExistentProfile", func(t *testing.T) {
+        cfg := test.SetupTestEnviroment(t)
+        defer test.CleanupTestEnviroment(t)
+
+        mockInput := test.NewMockInputProvider([]string{})
+        profile := handlers.NewProfileHandler(cfg, mockInput)
+
+        err := profile.EditProfile("nonexistent")
+        if err == nil {
+            t.Error("Expected error editing non-existent profile")
+        }
+    })
+}
+
+func TestDeleteProfile(t *testing.T) {
+    t.Run("ConfirmDelete", func(t *testing.T) {
+        cfg := test.SetupTestEnviroment(t)
+        defer test.CleanupTestEnviroment(t)
+
+        mockInput := test.NewMockInputProvider([]string{"y"})
+        profile := handlers.NewProfileHandler(cfg, mockInput)
+
+        err := profile.DeleteProfile("test")
+        if err != nil {
+            t.Errorf("DeleteProfile() error = %v", err)
+        }
+
+        if _, exists := cfg.Profiles["test"]; exists {
+            t.Error("Profile was not deleted")
+        }
+    })
+
+    t.Run("CancelDelete", func(t *testing.T) {
+        cfg := test.SetupTestEnviroment(t)
+        defer test.CleanupTestEnviroment(t)
+
+        mockInput := test.NewMockInputProvider([]string{"n"})
+        profile := handlers.NewProfileHandler(cfg, mockInput)
+
+        err := profile.DeleteProfile("test")
+        if err != nil {
+            t.Errorf("DeleteProfile() error = %v", err)
+        }
+
+        if _, exists := cfg.Profiles["test"]; !exists {
+            t.Error("Profile was deleted despite cancellation")
+        }
+    })
+
+    t.Run("NonExistentProfile", func(t *testing.T) {
+        cfg := test.SetupTestEnviroment(t)
+        defer test.CleanupTestEnviroment(t)
+
+        mockInput := test.NewMockInputProvider([]string{"y"})
+        profile := handlers.NewProfileHandler(cfg, mockInput)
+
+        err := profile.DeleteProfile("nonexistent")
+        if err == nil {
+            t.Error("Expected error deleting non-existent profile")
+        }
+    })
+}
+
+func TestListProfiles(t *testing.T) {
+    t.Run("ListAllProfiles", func(t *testing.T) {
+        cfg := test.SetupTestEnviroment(t)
+        defer test.CleanupTestEnviroment(t)
+
+        cfg.Profiles["test2"] = config.Profile{
+            User:  "test_user2",
+            Email: "test_email2@email.com",
+        }
+
+        profile := handlers.NewProfileHandler(cfg, test.NewMockInputProvider(nil))
+        
+        err := profile.ListProfiles()
+        if err != nil {
+            t.Errorf("ListProfiles() error = %v", err)
+        }
+    })
+}
+
 func TestCreateProfile(t *testing.T) {
     t.Run("ValidProfileCreation", func(t *testing.T) {
-        setupTestEnviroment(t)
-        defer cleanupTestEnviroment(t)
+        cfg := test.SetupTestEnviroment(t)
+        defer test.CleanupTestEnviroment(t)
 
         mockResponses := []string{
             "test_username",
             "test_email@gmail.com",
         }
         mockInput := test.NewMockInputProvider(mockResponses)
-        profile := handlers.NewProfileHandler(&test.TestConfig, mockInput)
+        profile := handlers.NewProfileHandler(cfg, mockInput)
 
         err := profile.CreateProfile("test_profile")
         if err != nil {
             t.Fatalf("Failed to create profile: %v", err)
         }
 
-        if p, exists := test.TestConfig.Profiles["test_profile"]; !exists {
+        if p, exists := cfg.Profiles["test_profile"]; !exists {
             t.Error("Profile was not created in config")
         } else {
             if p.User != "test_username" {
@@ -44,40 +183,18 @@ func TestCreateProfile(t *testing.T) {
     })
 
     t.Run("DuplicateProfileName", func(t *testing.T) {
-        setupTestEnviroment(t)
-        defer cleanupTestEnviroment(t)
+        cfg := test.SetupTestEnviroment(t)
+        defer test.CleanupTestEnviroment(t)
 
-        mockResponses := []string{
+        mockInput := test.NewMockInputProvider([]string{
             "another_username",
             "another_email@gmail.com",
-        }
-        mockInput := test.NewMockInputProvider(mockResponses)
-        profile := handlers.NewProfileHandler(&test.TestConfig, mockInput)
+        })
+        profile := handlers.NewProfileHandler(cfg, mockInput)
 
         err := profile.CreateProfile("test")
         if err == nil {
             t.Error("Expected error creating duplicate profile, got nil")
         }
     })
-}
-
-// @method: Utils
-func setupTestEnviroment(t *testing.T) {
-	var err error
-	testDir, err = os.MkdirTemp("", "githotswap-test-*")
-	if err != nil {
-		t.Fatalf("Failed to create test directory: %v", err)
-	}
-	config.SetConfigDir(testDir)
-
-	err = config.SaveConfig(&test.TestConfig)
-	if err != nil {
-		t.Fatalf("Failed to load config: %v", err)
-	}
-}
-
-func cleanupTestEnviroment(t *testing.T) {
-	if err := os.RemoveAll(testDir); err != nil {
-		t.Errorf("Failed to cleanup test directory: %v", err)
-	}
 }

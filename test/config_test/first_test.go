@@ -1,10 +1,10 @@
 package config_test
 
 import (
-	"testing"
+    "testing"
 
-	"github.com/artumont/GitHotswap/test"
-	"github.com/artumont/GitHotswap/internal/config"
+    "github.com/artumont/GitHotswap/test"
+    "github.com/artumont/GitHotswap/internal/config"
 )
 
 // @method: Tests
@@ -27,19 +27,19 @@ func TestFirstrun(t *testing.T) {
         setupTestDir(t)
         defer cleanupTestDir(t)
 
-        mockResponses := []string{
+        cfg := test.GetTestConfig()
+        mockInput := test.NewMockInputProvider([]string{
             "default",
             "test_username",
             "test@email.com",
-        }
-        mockInput := test.NewMockInputProvider(mockResponses)
+        })
 
-        err := config.FirstRunProtocol(&test.TestConfig, mockInput)
+        err := config.FirstRunProtocol(cfg, mockInput)
         if err != nil {
             t.Fatalf("Expected no error, got %v", err)
         }
 
-        if p, exists := test.TestConfig.Profiles["default"]; !exists {
+        if p, exists := cfg.Profiles["default"]; !exists {
             t.Error("Default profile was not created")
         } else {
             if p.User != "test_username" {
@@ -50,7 +50,7 @@ func TestFirstrun(t *testing.T) {
             }
         }
 
-        if test.TestConfig.FirstRun {
+        if cfg.FirstRun {
             t.Error("Expected FirstRun to be false after protocol completion")
         }
     })

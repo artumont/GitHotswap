@@ -1,21 +1,26 @@
 package test
 
-import "github.com/artumont/GitHotswap/internal/config"
+import (
+    "os"
+    "testing"
 
-var (
-	TestConfig config.Config = config.Config{
-		FirstRun: true,
-		Profiles: map[string]config.Profile{
-			"test": {
-				User: "test_user",
-				Email: "test_email@email.com",
-			},
-		},
-		Preferences: config.Preferences{
-			SwapMethod: "menu",
-		},
-	}
+    "github.com/artumont/GitHotswap/internal/config"
 )
+
+func GetTestConfig() *config.Config {
+    return &config.Config{
+        FirstRun: true,
+        Profiles: map[string]config.Profile{
+            "test": {
+                User:  "test_user",
+                Email: "test_email@email.com",
+            },
+        },
+        Preferences: config.Preferences{
+            SwapMethod: "menu",
+        },
+    }
+}
 
 type MockInputProvider struct {
     Responses []string
@@ -39,17 +44,42 @@ func (m *MockInputProvider) Prompt(prompt string, required bool) string {
 }
 
 func (m *MockInputProvider) Menu(options []string, prompt string) int {
-	if m.current >= len(m.Responses) {
-		return -1
-	}
-	response := m.Responses[m.current]
-	m.current++
-	
-	for i, option := range options {
-		if option == response {
-			return i
-		}
-	}
-	
-	return -1
+    if m.current >= len(m.Responses) {
+        return -1
+    }
+    response := m.Responses[m.current]
+    m.current++
+
+    for i, option := range options {
+        if option == response {
+            return i
+        }
+    }
+
+    return -1
+}
+
+var testDir string
+
+func SetupTestEnviroment(t *testing.T) *config.Config {
+    var err error
+    testDir, err = os.MkdirTemp("", "githotswap-test-*")
+    if err != nil {
+        t.Fatalf("Failed to create test directory: %v", err)
+    }
+    config.SetConfigDir(testDir)
+
+    cfg := GetTestConfig()
+    err = config.SaveConfig(cfg)
+    if err != nil {
+        t.Fatalf("Failed to save config: %v", err)
+    }
+
+    return cfg
+}
+
+func CleanupTestEnviroment(t *testing.T) {
+    if err := os.RemoveAll(testDir); err != nil {
+        t.Errorf("Failed to cleanup test directory: %v", err)
+    }
 }
