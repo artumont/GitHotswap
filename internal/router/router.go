@@ -4,12 +4,14 @@ import (
 	"errors"
 
 	"github.com/artumont/GitHotswap/internal/config"
+	"github.com/artumont/GitHotswap/internal/input"
 )
 
 type Router struct {
 	cfg      *config.Config
 	handlers map[string]CommandHandler
 	commands map[string]Command // @note: Command cache, used in the help handler
+	inputProvider input.InputProvider
 }
 
 func NewRouter(cfg *config.Config) *Router {
@@ -17,6 +19,7 @@ func NewRouter(cfg *config.Config) *Router {
 		cfg:      cfg,
 		handlers: make(map[string]CommandHandler),
 		commands: make(map[string]Command, 0),
+		inputProvider: input.NewInputProvider(),
 	}
 }
 
@@ -35,6 +38,10 @@ func (r *Router) GetCommands() *map[string]Command {
 
 func (r *Router) GetConfig() *config.Config {
 	return r.cfg
+}
+
+func (r *Router) GetInput() input.InputProvider {
+	return r.inputProvider
 }
 
 func (r *Router) Route(cmd string, args []string) error {

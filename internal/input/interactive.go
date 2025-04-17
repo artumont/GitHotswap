@@ -1,9 +1,12 @@
-package ui
+package input
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/artumont/GitHotswap/internal/ui"
 	"github.com/fatih/color"
 	"golang.org/x/term"
 )
@@ -15,13 +18,13 @@ const (
 	escapeKey = 27
 )
 
-func Menu(options []string, prompt string) int {
+func getMenu(options []string, prompt string) int {
 	if len(options) != 0 {
 		if oldState, err := term.MakeRaw(int(os.Stdin.Fd())); err == nil {
 			defer term.Restore(int(os.Stdin.Fd()), oldState)
 			selection := 0
 			for {
-				Clear()
+				ui.Clear()
 
 				fmt.Println(prompt)
 
@@ -33,7 +36,7 @@ func Menu(options []string, prompt string) int {
 					}
 				}
 
-				Info("Press arrow keys to navigate, Enter to select, or Esc to cancel.")
+				ui.Info("Press arrow keys to navigate, Enter to select, or Esc to cancel.")
 
 				buf := make([]byte, 3)
 				os.Stdin.Read(buf)
@@ -59,4 +62,13 @@ func Menu(options []string, prompt string) int {
 	}
 
 	return -1
+}
+
+func getPrompt(prompt string) string {
+	reader := bufio.NewReader(os.Stdin)
+	ui.Custom(color.HiBlueString("✎"), prompt)
+	response, _ := reader.ReadString('\n')
+	response = strings.TrimSpace(response)
+
+	return response
 }

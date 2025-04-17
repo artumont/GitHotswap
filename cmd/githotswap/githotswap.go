@@ -19,7 +19,14 @@ func main() {
 
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		panic(err)
+		ui.Error("Got a fatal error while loading the config: ", err.Error())
+		os.Exit(1)
+	}
+
+	err = config.CheckFirstRun(&cfg)
+	if err != nil {
+		ui.Error("Got a fatal error while checking the first run: ", err.Error())
+		os.Exit(1)
 	}
 
 	router := router.NewRouter(&cfg)

@@ -5,18 +5,10 @@ import (
 	"testing"
 
 	"github.com/artumont/GitHotswap/internal/config"
+	"github.com/artumont/GitHotswap/test"
 )
 
-var (
-	testConfig config.Config = config.Config{
-		FirstRun: true,
-		Profiles: map[string]config.Profile{},
-		Preferences: config.Preferences{
-			SwapMethod: "menu",
-		},
-	}
-	testDir string
-)
+var testDir string
 
 // @method: Tests
 func TestLoadConfig(t *testing.T) {
@@ -36,7 +28,7 @@ func TestSaveConfig(t *testing.T) {
 	setupTestDir(t)
 	defer cleanupTestDir(t)
 
-	err := config.SaveConfig(&testConfig)
+	err := config.SaveConfig(&test.TestConfig)
 	if err != nil {
 		t.Fatalf("Failed to save config: %v", err)
 	}
@@ -46,7 +38,7 @@ func TestSaveConfig(t *testing.T) {
 		t.Fatalf("Failed to load saved config: %v", err)
 	}
 
-	if loaded.Preferences != testConfig.Preferences {
+	if loaded.Preferences != test.TestConfig.Preferences {
 		t.Error("Loaded config does not match saved config")
 	}
 }

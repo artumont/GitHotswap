@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/artumont/GitHotswap/internal/config"
+	"github.com/artumont/GitHotswap/internal/input"
 	"github.com/artumont/GitHotswap/internal/router"
 	"github.com/artumont/GitHotswap/internal/ui"
 	"github.com/fatih/color"
@@ -12,11 +13,13 @@ import (
 
 type ProfileHandler struct {
 	cfg *config.Config
+	inputProvider input.InputProvider
 }
 
-func NewProfileHandler(cfg *config.Config) *ProfileHandler {
+func NewProfileHandler(cfg *config.Config, inputProvider input.InputProvider) *ProfileHandler {
 	return &ProfileHandler{
 		cfg: cfg,
+		inputProvider: inputProvider,
 	}
 }
 
@@ -77,9 +80,14 @@ func (p *ProfileHandler) GetCommandData() router.Command {
 // @method: Public
 // @note: They are public because they are used in the tests. (it should be like that on all handlers)
 func (p *ProfileHandler) CreateProfile(profileName string) error {
+	if _, exists := p.cfg.Profiles[profileName]; exists {
+		ui.Error("Profile already exists.")
+		return errors.New("profile already exists")
+	}
+
 	profile := config.Profile{
-		User:  ui.Input("Enter your Git username: ", true),
-		Email: ui.Input("Enter your Git email: ", true),
+		User:  p.inputProvider.Prompt("Enter your Git username: ", true),
+		Email: p.inputProvider.Prompt("Enter your Git email: ", true),
 	}
 
 	p.cfg.Profiles[profileName] = profile
@@ -100,15 +108,15 @@ func (p *ProfileHandler) EditProfile(profileName string) error {
 	}
 
 	options := []string{"User: " + profile.User, "Email: " + profile.Email, "Both"}
-	field := ui.Menu(options, "Select a field to edit:")
+	field := p.inputProvider.Menu(options, "Select a field to edit:")
 	switch field {
 	case 0:
-		profile.User = ui.Input("Enter new Git username: ", true)
+		profile.User = p.inputProvider.Prompt("Enter new Git username: ", true)
 	case 1:
-		profile.Email = ui.Input("Enter new Git email: ", true)
+		profile.Email = p.inputProvider.Prompt("Enter new Git email: ", true)
 	case 2:
-		profile.User = ui.Input("Enter new Git username: ", true)
-		profile.Email = ui.Input("Enter new Git email: ", true)
+		profile.User = p.inputProvider.Prompt("Enter new Git username: ", true)
+		profile.Email = p.inputProvider.Prompt("Enter new Git email: ", true)
 	case -1:
 		ui.Error("Operation cancelled")
 		return nil
@@ -125,7 +133,7 @@ func (p *ProfileHandler) EditProfile(profileName string) error {
 }
 
 func (p *ProfileHandler) DeleteProfile(profileName string) error {
-	sure := ui.Input("Are you sure you want to delete this profile? (y/n): ", true)
+	sure := p.inputProvider.Prompt("Are you sure you want to delete this profile? (y/n): ", true)
 	if strings.ToLower(sure) != "y" {
 		ui.Error("Operation cancelled")
 		return nil
