@@ -11,6 +11,11 @@ func RegistryInit(r *router.Router) {
 		handlers.NewProfileHandler(r.GetConfig(), r.GetInput()),
 	)
 
+	r.RegisterHandler(
+		"swap",
+		handlers.NewSwapHandler(r.GetConfig(), r.GetInput()),
+	)
+
 	// @note: the 'help' command should be the last one registered as it is the one that holds all the command data.
 	r.RegisterHandler(
 		"help",
