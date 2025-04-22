@@ -157,19 +157,3 @@ func validateProfile(profile config.Profile) error {
 func writeConfigFile(configPath string, content []string) error { // @todo: Add some sort of backup system to avoid accidental data deletion
 	return os.WriteFile(configPath, []byte(strings.Join(content, "\n")+"\n"), 0644)
 }
-
-func getUser(content string) (string, error) {
-	matches := nameRegex.FindStringSubmatch(content)
-	if len(matches) > 1 {
-		return matches[1], nil
-	}
-	return "", errors.New("user not found")
-}
-
-func getEmail(content string) (string, error) {
-	matches := emailRegex.FindStringSubmatch(content)
-	if len(matches) > 1 {
-		return matches[1], nil
-	}
-	return "", errors.New("email not found")
-}
