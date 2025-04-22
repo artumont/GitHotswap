@@ -85,35 +85,43 @@ func ChangeGitProfile(profile config.Profile) error {
 
 
 func GetCurrentGitProfile() (*config.Profile, error) {
-	var profile config.Profile = config.Profile{}
-
 	dir, err := getGitPath()
 	if err != nil {
 		return nil, err
 	}
-
+	
 	configPath, err := getGitConfig(dir)
 	if err != nil {
 		return nil, err
 	}
 	
-	content, err := os.ReadFile(configPath)
-	if err != nil {
-		return nil, err
-	}
+	file, err := os.Open(configPath)
+    if err != nil {
+        return nil, err
+    }
+    defer file.Close()
 
-	user, err := getUser(string(content))
-	if err != nil {
-		return nil, err
-	}
-	email, err := getEmail(string(content))
-	if err != nil {
-		return nil, err
-	}
+    var profile config.Profile
+    scanner := bufio.NewScanner(file)
+    
+    for scanner.Scan() {
+        line := scanner.Text()
+        if matches := nameRegex.FindStringSubmatch(line); len(matches) > 1 {
+            profile.User = matches[1]
+        } else if matches := emailRegex.FindStringSubmatch(line); len(matches) > 1 {
+            profile.Email = matches[1]
+        }
+    }
 
-	profile.User = user
-	profile.Email = email
-	return &profile, nil
+	if err := scanner.Err(); err != nil {
+        return nil, err
+    }
+
+    if profile.User == "" || profile.Email == "" {
+        return nil, errors.New("incomplete git profile: missing user or email")
+    }
+
+    return &profile, nil
 }
 
 // @method: Private
