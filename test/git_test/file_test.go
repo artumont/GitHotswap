@@ -20,6 +20,66 @@ var (
 )
 
 // @method: Tests
+func TestGetCurrentGitProfile(t *testing.T) {
+	t.Run("SuccessfulProfileRetrieval", func(t *testing.T) {
+		setupTestEnviroment(t)
+		defer cleanupTestEnviroment(t)
+
+		// First change the profile so we know what to expect
+		if err := git.ChangeGitProfile(testProfile); err != nil {
+			t.Fatalf("Failed to set up test profile: %v", err)
+		}
+
+		profile, err := git.GetCurrentGitProfile()
+		if err != nil {
+			t.Fatalf("Failed to get current git profile: %v", err)
+		}
+
+		if profile.User != testProfile.User {
+			t.Errorf("Expected user %s, got %s", testProfile.User, profile.User)
+		}
+		if profile.Email != testProfile.Email {
+			t.Errorf("Expected email %s, got %s", testProfile.Email, profile.Email)
+		}
+	})
+
+	t.Run("InvalidGitDirectory", func(t *testing.T) {
+		setupTestEnviroment(t)
+		defer cleanupTestEnviroment(t)
+
+		gitDir := filepath.Join(testDir, ".git")
+		if err := os.RemoveAll(gitDir); err != nil {
+			t.Fatalf("Failed to remove .git directory: %v", err)
+		}
+
+		profile, err := git.GetCurrentGitProfile()
+		if err == nil {
+			t.Error("Expected error getting profile from non-git directory")
+		}
+		if profile != nil {
+			t.Error("Expected nil profile when error occurs")
+		}
+	})
+
+	t.Run("InaccessibleGitConfig", func(t *testing.T) {
+		setupTestEnviroment(t)
+		defer cleanupTestEnviroment(t)
+
+		configPath := filepath.Join(testDir, ".git", "config")
+		if err := os.Remove(configPath); err != nil {
+			t.Fatalf("Failed to remove git config: %v", err)
+		}
+
+		profile, err := git.GetCurrentGitProfile()
+		if err == nil {
+			t.Error("Expected error getting profile with missing config")
+		}
+		if profile != nil {
+			t.Error("Expected nil profile when error occurs")
+		}
+	})
+}
+
 func TestProfileChange(t *testing.T) {
 	t.Run("ValidProfileChange", func(t *testing.T) {
 		setupTestEnviroment(t)
