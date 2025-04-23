@@ -45,3 +45,14 @@ func (s *SwapHandler) GetCommandData() router.Command {
 
 // @method: Public
 // @note: They are public because they are used in the tests. (it should be like that on all handlers)
+func (s *SwapHandler) Hotswap() error {
+	return nil
+}
+
+func (s *SwapHandler) Menuswap() error {
+	return nil
+}
+
+func (s *SwapHandler) SwapTo(name string) error {
+	return nil
+}
