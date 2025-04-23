@@ -93,6 +93,7 @@ func (p *ProfileHandler) CreateProfile(profileName string) error {
 	p.cfg.Profiles[profileName] = profile
 
 	if err := config.SaveConfig(p.cfg); err != nil {
+		ui.Error("Failed to save profile.")
 		return err
 	}
 
@@ -118,13 +119,14 @@ func (p *ProfileHandler) EditProfile(profileName string) error {
 		profile.User = p.inputProvider.Prompt("Enter new Git username: ", true)
 		profile.Email = p.inputProvider.Prompt("Enter new Git email: ", true)
 	case -1:
-		ui.Error("Operation cancelled")
+		ui.Warning("Operation cancelled")
 		return nil
 	}
 
 	p.cfg.Profiles[profileName] = profile
 
 	if err := config.SaveConfig(p.cfg); err != nil {
+		ui.Error("Failed to save profile.")
 		return err
 	}
 
@@ -135,7 +137,7 @@ func (p *ProfileHandler) EditProfile(profileName string) error {
 func (p *ProfileHandler) DeleteProfile(profileName string) error {
 	sure := p.inputProvider.Prompt("Are you sure you want to delete this profile? (y/n): ", true)
 	if strings.ToLower(sure) != "y" {
-		ui.Error("Operation cancelled")
+		ui.Warning("Operation cancelled")
 		return nil
 	}
 
@@ -148,6 +150,7 @@ func (p *ProfileHandler) DeleteProfile(profileName string) error {
 	delete(p.cfg.Profiles, profileName)
 
 	if err := config.SaveConfig(p.cfg); err != nil {
+		ui.Error("Failed to save profile.")
 		return err
 	}
 
@@ -162,9 +165,5 @@ func (p *ProfileHandler) ListProfiles() error {
 		ui.Custom(color.HiCyanString("   •"), "Email: ", profile.Email)
 	}
 
-	return nil
-}
-
-func (p *ProfileHandler) CurrentProfile() error {
 	return nil
 }
