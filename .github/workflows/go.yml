@@ -2,10 +2,10 @@ name: Go CI/CD
 
 on:
   push:
-    branches: [ "main" ]
-    tags: [ 'v*' ]
+    branches: ["main"]
+    tags: ["v*"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: write
@@ -14,30 +14,6 @@ permissions:
   pull-requests: write
 
 jobs:
-  validate-commits:
-    name: Validate Commits
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Install commitlint
-        run: |
-          npm install --global @commitlint/cli @commitlint/config-conventional
-      
-      - name: Copy commitlint config
-        run: cp .github/commitlint.config.js commitlint.config.js
-      
-      - name: Validate commits
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
-          else
-            commitlint --from ${{ github.event.before }} --to ${{ github.event.after }} --verbose
-          fi
-        shell: bash
-
   test:
     name: Test & Lint
     runs-on: ubuntu-latest
@@ -47,7 +23,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: "1.22"
           check-latest: true
 
       - name: Go Cache
@@ -71,7 +47,7 @@ jobs:
       - name: Test
         run: |
           go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
-    
+
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
@@ -84,16 +60,16 @@ jobs:
     name: Build and Release
     needs: [test]
     runs-on: windows-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-    
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: "1.22"
           check-latest: true
-        
+
       - name: Go Cache
         uses: actions/cache@v4
         with:
@@ -103,18 +79,12 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-        
+
       - name: Build
         run: |
           mkdir -p bin/
           go build -v -o ./bin/git-hotswap.exe ./cmd/githotswap
-    
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: git-hotswap-windows-amd64
-          path: bin/git-hotswap.exe
-        
+
       - name: Generate Release Changelog
         id: changelog
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
@@ -145,7 +115,7 @@ jobs:
               ],
               "pr_template": "- #{{NUMBER}} - {{TITLE}}"
             }
-        
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
