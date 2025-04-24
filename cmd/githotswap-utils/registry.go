@@ -6,19 +6,30 @@ import (
 )
 
 func RegistryInit(r *router.Router) {
-	r.RegisterHandler(
+	var err error
+
+	err = r.RegisterHandler(
 		"profile",
 		handlers.NewProfileHandler(r.GetConfig(), r.GetInput()),
 	)
+	if err != nil {
+		panic(err)
+	}
 
-	r.RegisterHandler(
+	err = r.RegisterHandler(
 		"swap",
 		handlers.NewSwapHandler(r.GetConfig(), r.GetInput()),
 	)
+	if err != nil {
+		panic(err)
+	}
 
 	// @note: the 'help' command should be the last one registered as it is the one that holds all the command data.
-	r.RegisterHandler(
+	err = r.RegisterHandler(
 		"help",
 		handlers.NewHelpHandler(r.GetCommands()),
 	)
+	if err != nil {
+		panic(err)
+	}
 }
