@@ -27,5 +27,11 @@ func (p *DefaultInputProvider) Prompt(prompt string, required bool) string {
 }
 
 func (p *DefaultInputProvider) Menu(options []string, prompt string) int {
-	return getMenu(options, prompt)
+	digit := getMenu(options, prompt)
+	if digit == -99 {
+		ui.Error("Something went wrong while reading the input, retrying.")
+		return p.Menu(options, prompt)
+	}
+	
+	return digit
 }

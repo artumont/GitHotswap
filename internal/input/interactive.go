@@ -21,7 +21,7 @@ const (
 func getMenu(options []string, prompt string) int {
 	if len(options) != 0 {
 		if oldState, err := term.MakeRaw(int(os.Stdin.Fd())); err == nil {
-			defer term.Restore(int(os.Stdin.Fd()), oldState)
+			defer cleanupTerminal(oldState)
 			selection := 0
 			for {
 				ui.Clear()
@@ -39,7 +39,11 @@ func getMenu(options []string, prompt string) int {
 				ui.Info("Press arrow keys to navigate, Enter to select, or Esc to cancel.")
 
 				buf := make([]byte, 3)
-				os.Stdin.Read(buf)
+				_, err := os.Stdin.Read(buf)
+				if err != nil {
+					// @note: This should never happen, but if it does, we return -99 to indicate an error.
+					return -99
+				}
 
 				if buf[0] == escapeKey && buf[1] == '[' { // @note: Arrow keys send 3 bytes [( 27 aka "esc" ), ( 91 aka "[" ), {keycode}]
 					switch buf[2] {
@@ -71,4 +75,12 @@ func getPrompt(prompt string) string {
 	response = strings.TrimSpace(response)
 
 	return response
+}
+
+// @method Private
+func cleanupTerminal(oldState *term.State) {
+	if err := term.Restore(int(os.Stdin.Fd()), oldState); err != nil {
+		// @note: Log the error but continue since this is cleanup code
+		fmt.Fprintf(os.Stderr, "Failed to restore terminal: %v\n", err)
+	}
 }
