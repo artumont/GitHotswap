@@ -46,14 +46,14 @@ func TestHelpCommands(t *testing.T) {
 	t.Run("AllComands", func(t *testing.T) {
 		err := help.PrintAllCommands()
 		if err != nil {
-			t.Errorf("Error printing all commands: %v", err)
+			t.Errorf("PrintAllCommands() = Error printing all commands: %v", err)
 		}
 	})
 
 	t.Run("OneCommand", func(t *testing.T) {
 		err := help.PrintOneCommand("test")
 		if err != nil {
-			t.Errorf("Error printing one command: %v", err)
+			t.Errorf("PrintOneCommand() = Error printing one command: %v", err)
 		}
 	})
 }

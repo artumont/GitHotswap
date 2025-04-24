@@ -83,45 +83,44 @@ func ChangeGitProfile(profile config.Profile) error {
 	return writeConfigFile(configPath, lines)
 }
 
-
-func GetCurrentGitProfile() (*config.Profile, error) {
+func GetCurrentGitProfile() (config.Profile, error) {
 	dir, err := getGitPath()
 	if err != nil {
-		return nil, err
+		return config.Profile{}, err
 	}
-	
+
 	configPath, err := getGitConfig(dir)
 	if err != nil {
-		return nil, err
+		return config.Profile{}, err
 	}
-	
-	file, err := os.Open(configPath)
-    if err != nil {
-        return nil, err
-    }
-    defer file.Close()
 
-    var profile config.Profile
-    scanner := bufio.NewScanner(file)
-    
-    for scanner.Scan() {
-        line := scanner.Text()
-        if matches := nameRegex.FindStringSubmatch(line); len(matches) > 1 {
-            profile.User = matches[1]
-        } else if matches := emailRegex.FindStringSubmatch(line); len(matches) > 1 {
-            profile.Email = matches[1]
-        }
-    }
+	file, err := os.Open(configPath)
+	if err != nil {
+		return config.Profile{}, err
+	}
+	defer file.Close()
+
+	var profile config.Profile
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if matches := nameRegex.FindStringSubmatch(line); len(matches) > 1 {
+			profile.User = matches[1]
+		} else if matches := emailRegex.FindStringSubmatch(line); len(matches) > 1 {
+			profile.Email = matches[1]
+		}
+	}
 
 	if err := scanner.Err(); err != nil {
-        return nil, err
-    }
+		return config.Profile{}, err
+	}
 
-    if profile.User == "" || profile.Email == "" {
-        return nil, errors.New("incomplete git profile: missing user or email")
-    }
+	if profile.User == "" || profile.Email == "" {
+		return config.Profile{}, errors.New("incomplete git profile: missing user or email")
+	}
 
-    return &profile, nil
+	return profile, nil
 }
 
 // @method: Private
