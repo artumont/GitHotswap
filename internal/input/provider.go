@@ -1,6 +1,8 @@
 package input
 
-import "github.com/artumont/GitHotswap/internal/ui"
+import (
+	"github.com/artumont/GitHotswap/internal/ui"
+)
 
 type InputProvider interface {
 	Prompt(prompt string, required bool) string
@@ -16,9 +18,9 @@ func NewInputProvider() InputProvider {
 func (p *DefaultInputProvider) Prompt(prompt string, required bool) string {
 	response := getPrompt(prompt)
 
-	if required && response == "" {
+	for required && response == "" {
 		ui.Error("Input cannot be empty.")
-		return getPrompt(prompt)
+		return p.Prompt(prompt, required)
 	}
 
 	return response
