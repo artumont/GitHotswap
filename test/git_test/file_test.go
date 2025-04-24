@@ -8,6 +8,7 @@ import (
 
 	"github.com/artumont/GitHotswap/internal/config"
 	"github.com/artumont/GitHotswap/internal/git"
+	"github.com/artumont/GitHotswap/test"
 )
 
 var (
@@ -23,9 +24,8 @@ var (
 func TestGetCurrentGitProfile(t *testing.T) {
 	t.Run("SuccessfulProfileRetrieval", func(t *testing.T) {
 		setupTestEnviroment(t)
-		defer cleanupTestEnviroment(t)
+		defer test.CleanupTestEnviroment(t)
 
-		// First change the profile so we know what to expect
 		if err := git.ChangeGitProfile(testProfile); err != nil {
 			t.Fatalf("Failed to set up test profile: %v", err)
 		}
@@ -45,7 +45,7 @@ func TestGetCurrentGitProfile(t *testing.T) {
 
 	t.Run("InvalidGitDirectory", func(t *testing.T) {
 		setupTestEnviroment(t)
-		defer cleanupTestEnviroment(t)
+		defer test.CleanupTestEnviroment(t)
 
 		gitDir := filepath.Join(testDir, ".git")
 		if err := os.RemoveAll(gitDir); err != nil {
@@ -56,14 +56,14 @@ func TestGetCurrentGitProfile(t *testing.T) {
 		if err == nil {
 			t.Error("Expected error getting profile from non-git directory")
 		}
-		if profile != nil {
+		if profile != (config.Profile{}) {
 			t.Error("Expected nil profile when error occurs")
 		}
 	})
 
 	t.Run("InaccessibleGitConfig", func(t *testing.T) {
 		setupTestEnviroment(t)
-		defer cleanupTestEnviroment(t)
+		defer test.CleanupTestEnviroment(t)
 
 		configPath := filepath.Join(testDir, ".git", "config")
 		if err := os.Remove(configPath); err != nil {
@@ -74,7 +74,7 @@ func TestGetCurrentGitProfile(t *testing.T) {
 		if err == nil {
 			t.Error("Expected error getting profile with missing config")
 		}
-		if profile != nil {
+		if profile != (config.Profile{}) {
 			t.Error("Expected nil profile when error occurs")
 		}
 	})
@@ -83,7 +83,7 @@ func TestGetCurrentGitProfile(t *testing.T) {
 func TestProfileChange(t *testing.T) {
 	t.Run("ValidProfileChange", func(t *testing.T) {
 		setupTestEnviroment(t)
-		defer cleanupTestEnviroment(t)
+		defer test.CleanupTestEnviroment(t)
 
 		if err := git.ChangeGitProfile(testProfile); err != nil {
 			t.Fatalf("Failed to change git profile: %v", err)
@@ -106,7 +106,7 @@ func TestProfileChange(t *testing.T) {
 
 	t.Run("InvalidGitDirectory", func(t *testing.T) {
 		setupTestEnviroment(t)
-		defer cleanupTestEnviroment(t)
+		defer test.CleanupTestEnviroment(t)
 
 		gitDir := filepath.Join(testDir, ".git")
 		if err := os.RemoveAll(gitDir); err != nil {
@@ -120,7 +120,7 @@ func TestProfileChange(t *testing.T) {
 
 	t.Run("ReadOnlyGitConfig", func(t *testing.T) {
 		setupTestEnviroment(t)
-		defer cleanupTestEnviroment(t)
+		defer test.CleanupTestEnviroment(t)
 
 		configPath := filepath.Join(testDir, ".git", "config")
 		if err := os.Chmod(configPath, 0444); err != nil {
@@ -133,7 +133,7 @@ func TestProfileChange(t *testing.T) {
 	})
 }
 
-// @method: Utils
+// @method: Utilities
 func setupTestEnviroment(t *testing.T) {
 	var err error
 	testDir, err = os.MkdirTemp("", "githotswap-test-*")
@@ -164,10 +164,4 @@ func setupTestEnviroment(t *testing.T) {
 
 func setupDummyConfig(path string) error {
 	return os.WriteFile(path, []byte(strings.Join(testConfigContents, "\n")+"\n"), 0644)
-}
-
-func cleanupTestEnviroment(t *testing.T) {
-	if err := os.RemoveAll(testDir); err != nil {
-		t.Errorf("Failed to cleanup test directory: %v", err)
-	}
 }
