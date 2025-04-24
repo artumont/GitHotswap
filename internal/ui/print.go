@@ -33,3 +33,7 @@ func Custom(prefix string, args ...any) {
 func Clear() {
 	fmt.Print("\033[H\033[2J")
 }
+
+func CustomString(prefix string, args ...any) string {
+	return fmt.Sprintf("%s  %s", prefix, color.WhiteString(fmt.Sprint(args...)))
+}

@@ -66,7 +66,7 @@ func getMenu(options []string, prompt string) int {
 
 func getPrompt(prompt string) string {
 	reader := bufio.NewReader(os.Stdin)
-	ui.Custom(color.HiBlueString("✎"), prompt)
+	fmt.Print(ui.CustomString(color.HiBlueString("✎"), prompt))
 	response, _ := reader.ReadString('\n')
 	response = strings.TrimSpace(response)
 
