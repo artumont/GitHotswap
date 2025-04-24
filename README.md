@@ -47,38 +47,31 @@ build.cmd
 
 ## 🚀 Usage
 
-### Help Command
-Get help information for all commands or a specific command:
+### Swap
+Every operation that is related to the swap of git profiles.
+
+```bash
+git-hotswap swap              # Swap to a profile using the active mode (menu or hotswap)
+git-hotswap swap to <profile> # Swap to a specific profile
+git-hotswap swap mode <menu|hotswap> # Change the swap mode
+```
+
+### Help
+Shows help for all commands.
+
 ```bash
 git-hotswap help           # Show minimized help information for all commands
 git-hotswap help <command> # Show detailed help information for a specific command
 ```
 
-### Managing Profiles
-```bash
-git-hotswap profile create <profile>  # Create a new profile
-git-hotswap profile delete <profile>  # Delete a profile
-git-hotswap profile edit <profile>    # Edit a profile
-git-hotswap profile current          # Get the current profile
-git-hotswap profile list            # List all profiles
-```
+### Profile
+Every operation that is related to the user profile.
 
-### Switching Profiles
 ```bash
-git-hotswap swap          # Swap to a profile depending on the active one
-git-hotswap swap menu     # Swap to a profile using the menu
-git-hotswap swap hotswap  # Swap to a profile using hotswap
-git-hotswap swap to <profile>  # Swap to a specific profile
-```
-
-### Configuration Management
-```bash
-git-hotswap config show           # Show the current configuration
-git-hotswap config reset          # Reset the configuration file to default
-git-hotswap config open           # Open the configuration file in the default editor
-git-hotswap config backup <path>  # Backup the configuration file
-git-hotswap config restore <path> # Restore the configuration file from backup
-git-hotswap config swap_method <method> # Set the swap method (menu or hotswap)
+git-hotswap profile create <profile> # Creates a new profile
+git-hotswap profile edit <profile>   # Edits a profile
+git-hotswap profile delete <profile> # Deletes a profile
+git-hotswap profile list            # Lists all profiles
 ```
 
 ## 🤝 Contributing
