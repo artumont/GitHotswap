@@ -18,14 +18,19 @@ module.exports = {
                 'build'     // @note: Build system or external dependencies
             ]
         ],
-        'type-case': [2, 'always', 'lower'],
+        'type-case': [2, 'always', 'lowercase'],
         'type-empty': [2, 'never'],
-        'subject-case': [2, 'always', 'sentence-case'],
+        'scope-case': [2, 'always', ['lower-case', 'kebab-case']],
+        'subject-case': [
+            2,
+            'never',
+            ['upper-case', 'pascal-case', 'camel-case']
+        ],
         'subject-empty': [2, 'never'],
         'subject-full-stop': [2, 'never', '.'],
-        'subject-min-length': [2, 'always', 5],
-        'body-leading-blank': [2, 'always'],
         'header-max-length': [2, 'always', 72],
-        'footer-leading-blank': [1, 'always']
+        'body-leading-blank': [1, 'always'],
+        'footer-leading-blank': [1, 'always'],
+        'footer-max-line-length': [2, 'always', 100]
     }
 };
