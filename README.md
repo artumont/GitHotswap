@@ -37,7 +37,7 @@ cd GitHotswap
 
 2. Build the application:
 ```bash
-go build -o ./bin/git-hotswap.exe ./src/
+go build -v -o ./bin/git-hotswap.exe ./cmd/githotswap
 ```
 
 Or use the provided build script:
