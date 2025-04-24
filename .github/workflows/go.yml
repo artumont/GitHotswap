@@ -1,46 +1,149 @@
-name: Release Binary
+name: Go CI/CD
 
 on:
   push:
-    tags:
-      - 'v*'  # @note: Triggers only on version tags
+    branches: [ "main" ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
   contents: write
   discussions: write
   packages: write
+  pull-requests: write
 
 jobs:
+  validate-commits:
+    name: Validate Commits
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Conventional Commit Validation
+        uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: .github/commitlint.config.js
+
+  test:
+    name: Test & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          check-latest: true
+
+      - name: Go Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: latest
+
+      - name: Lint
+        run: golangci-lint run ./...
+
+      - name: Test
+        run: |
+          go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+    
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.txt
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
   build:
     name: Build and Release
+    needs: [test]
     runs-on: windows-latest
     
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
     
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.22'
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          check-latest: true
         
-    - name: Build
-      run: |
-        mkdir -p bin/
-        go build -v -o bin/git-hotswap.exe ./src
+      - name: Go Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+        
+      - name: Build
+        run: |
+          mkdir -p bin/
+          go build -v -o ./bin/git-hotswap.exe ./cmd/githotswap
     
-    - name: Changelog
-      id: changelog
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: mikepenz/release-changelog-builder-action@v5
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: git-hotswap-windows-amd64
+          path: bin/git-hotswap.exe
         
-    - name: Release
-      id: create_release
-      uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        make_latest: 'true'
-        name: 'Version ${{ github.ref_name }}'
-        body: ${{ steps.changelog.outputs.changelog }}
-        files: bin/git-hotswap.exe
+      - name: Generate Release Changelog
+        id: changelog
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: mikepenz/release-changelog-builder-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          configurationJson: |
+            {
+              "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
+              "categories": [
+                {
+                  "title": "## 🚀 Features",
+                  "labels": ["feature", "enhancement", "feat"]
+                },
+                {
+                  "title": "## 🐛 Fixes",
+                  "labels": ["fix", "bug"]
+                },
+                {
+                  "title": "## 📝 Documentation",
+                  "labels": ["documentation", "docs"]
+                },
+                {
+                  "title": "## 🔨 Maintenance",
+                  "labels": ["chore", "style", "refactor"]
+                }
+              ],
+              "pr_template": "- #{{NUMBER}} - {{TITLE}}"
+            }
+        
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          make_latest: true
+          name: Version ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          files: |
+            bin/*
+          fail_on_unmatched_files: true
+          generate_release_notes: true
