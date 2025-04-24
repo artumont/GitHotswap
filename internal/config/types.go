@@ -1,4 +1,4 @@
-package types
+package config
 
 type Config struct {
 	FirstRun    bool               `json:"first_run"`

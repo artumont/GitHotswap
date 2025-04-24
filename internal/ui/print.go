@@ -1,9 +1,8 @@
-package utils
+package ui
 
 import (
 	"fmt"
 
-	"github.com/artumont/GitHotswap/src/types"
 	"github.com/fatih/color"
 )
 
@@ -31,14 +30,10 @@ func Custom(prefix string, args ...any) {
 	fmt.Printf("%s  %s \n", prefix, color.WhiteString(fmt.Sprint(args...)))
 }
 
-func CustomString(prefix string, args ...any) string {
-	return fmt.Sprintf("%s  %s", prefix, color.WhiteString(fmt.Sprint(args...)))
+func Clear() {
+	fmt.Print("\033[H\033[2J")
 }
 
-func CommandList(commands []types.Command) {
-	color.White("Available commands:")
-	for _, command := range commands {
-		fmt.Printf("  %s - %s\n", command.Name, command.Description)
-	}
-	fmt.Println("Use 'git-hotswap help <command>' for more information about a command.")
+func CustomString(prefix string, args ...any) string {
+	return fmt.Sprintf("%s  %s", prefix, color.WhiteString(fmt.Sprint(args...)))
 }
