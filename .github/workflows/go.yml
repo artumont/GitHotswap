@@ -17,16 +17,26 @@ jobs:
   validate-commits:
     name: Validate Commits
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       
-      - name: Conventional Commit Validation
-        uses: wagoid/commitlint-github-action@v5
-        with:
-          configFile: .github/commitlint.config.js
+      - name: Install commitlint
+        run: |
+          npm install --global @commitlint/cli @commitlint/config-conventional
+      
+      - name: Copy commitlint config
+        run: cp .github/commitlint.config.js commitlint.config.js
+      
+      - name: Validate commits
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+          else
+            commitlint --from ${{ github.event.before }} --to ${{ github.event.after }} --verbose
+          fi
+        shell: bash
 
   test:
     name: Test & Lint
@@ -107,7 +117,7 @@ jobs:
         
       - name: Generate Release Changelog
         id: changelog
-        if: startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         uses: mikepenz/release-changelog-builder-action@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -138,7 +148,7 @@ jobs:
         
       - name: Create Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         with:
           make_latest: true
           name: Version ${{ github.ref_name }}
